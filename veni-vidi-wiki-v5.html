@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Veni, vidi, wiki</title>
+    <script src="daten.js"></script>
     <style>
         :root {
             --primary: #2563eb;
@@ -15,612 +16,445 @@
             --success: #16a34a;
             --danger: #dc2626;
         }
-
         * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
         body { background-color: var(--bg); color: var(--text); margin: 0; padding: 12px; display: flex; justify-content: center; }
-        .container { max-width: 760px; width: 100%; background: var(--card); border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); padding: 20px; }
-        
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 18px; gap: 10px; }
-        .header-title { text-align: left; }
-        h1 { margin: 0; font-size: 1.85rem; letter-spacing: -0.5px; color: #0f172a; }
+        .container { max-width: 780px; width: 100%; background: var(--card); border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); padding: 22px; overflow: hidden; }
+        header { text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 14px; margin-bottom: 18px; position: relative; }
+        h1 { margin: 0; font-size: 1.9rem; letter-spacing: -0.5px; color: #0f172a; }
         h1 span { color: var(--primary); }
-        .subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 3px; }
-
-        .sound-btn { background: #f1f5f9; border: 1.5px solid #cbd5e1; color: var(--text); padding: 7px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
-        .sound-btn:hover { background: #e2e8f0; }
+        .subtitle { color: var(--muted); font-size: 0.92rem; margin-top: 4px; }
+        .sound-toggle { position: absolute; top: 0; right: 0; background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 6px 10px; font-size: 0.85rem; cursor: pointer; font-weight: 600; color: var(--text); }
+        @media (max-width: 550px) { .sound-toggle { position: static; margin-top: 10px; display: inline-block; } }
 
         .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
         @media (max-width: 600px) { .setup-grid { grid-template-columns: 1fr; } }
-
         label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.88rem; }
-        select, input[type="text"], input[type="number"] { width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 1rem; background: #fff; color: var(--text); }
+        select, input[type="text"], input[type="number"] { width: 100%; padding: 9px 11px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; background: #fff; }
         select:focus, input:focus { outline: none; border-color: var(--primary); }
 
         .player-setup { background: #f1f5f9; padding: 14px; border-radius: 10px; margin-bottom: 18px; }
-        .player-input-row { display: flex; gap: 8px; }
-        .player-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; min-height: 32px; }
-        .player-tag { background: var(--primary); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; font-weight: 500; }
-        .player-tag button { background: rgba(255,255,255,0.25); border: none; color: white; font-weight: bold; cursor: pointer; width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.95rem; line-height: 1; padding: 0; }
-        .player-tag button:hover { background: rgba(255,255,255,0.45); }
+        .player-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .player-tag { background: var(--primary); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.88rem; display: flex; align-items: center; gap: 8px; }
+        .player-tag small { opacity: 0.85; font-size: 0.78rem; }
+        .player-tag button { background: none; border: none; color: white; font-weight: bold; cursor: pointer; padding: 0; font-size: 1rem; }
 
-        .btn { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.15s; width: 100%; }
-        .btn:hover { background: var(--primary-hover); }
+        .btn { background: var(--primary); color: white; border: none; padding: 11px 18px; border-radius: 8px; font-size: 0.98rem; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; }
+        .btn:hover:not(:disabled) { background: var(--primary-hover); }
         .btn:disabled { background: #94a3b8; cursor: not-allowed; }
         .btn-secondary { background: #e2e8f0; color: var(--text); }
-        .btn-secondary:hover { background: #cbd5e1; }
-        .btn-small { padding: 9px 14px; font-size: 0.9rem; width: auto; white-space: nowrap; }
+        .btn-secondary:hover:not(:disabled) { background: #cbd5e1; }
+        .btn-small { padding: 8px 13px; font-size: 0.88rem; width: auto; }
 
         .hidden { display: none !important; }
-
-        /* Statusleiste Handy-optimiert & fixiert */
-        .status-bar { display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 10px 12px; border-radius: 10px; margin-bottom: 14px; gap: 8px; flex-wrap: nowrap; }
-        .status-left { font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
-        .status-badges { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
-        .badge { padding: 5px 8px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
-        .badge-round { background: #e2e8f0; color: #334155; }
+        .status-bar { display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 10px 14px; border-radius: 10px; margin-bottom: 14px; gap: 8px; flex-wrap: wrap; }
+        .status-left { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 0.92rem; }
+        .status-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .badge { padding: 5px 9px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; white-space: nowrap; }
         .badge-points { background: #dbeafe; color: #1e40af; }
-        .badge-timer { background: #fef3c7; color: #92400e; min-width: 68px; text-align: center; display: inline-block; }
+        .badge-timer { background: #fef3c7; color: #92400e; font-variant-numeric: tabular-nums; min-width: 78px; text-align: center; display: inline-block; }
         .badge-timer.urgent { background: #fee2e2; color: #b91c1c; animation: pulse 1s infinite; }
-
-        @media (max-width: 480px) {
-            .container { padding: 14px; }
-            h1 { font-size: 1.5rem; }
-            .status-bar { padding: 8px 10px; gap: 6px; }
-            .status-left { font-size: 0.82rem; }
-            .badge { padding: 4px 6px; font-size: 0.78rem; }
-            .badge-timer { min-width: 58px; }
-        }
-
+        .badge-tie { background: #fae8ff; color: #86198f; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
-        .tiebreaker-banner { background: #fef3c7; border: 2px solid #f59e0b; color: #92400e; padding: 10px 14px; border-radius: 10px; font-weight: 700; text-align: center; margin-bottom: 14px; }
-
-        .wiki-box { background: #fff; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 18px; margin-bottom: 16px; line-height: 1.65; font-size: 1.02rem; min-height: 120px; }
+        .wiki-box { background: #fff; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 18px; margin-bottom: 18px; line-height: 1.65; font-size: 1.02rem; min-height: 120px; width: 100%; overflow-wrap: break-word; word-wrap: break-word; }
         .wiki-paragraph { margin-bottom: 12px; animation: fadeIn 0.35s ease; }
         .wiki-paragraph:last-child { margin-bottom: 0; }
-        .redacted { background-color: #1e293b; color: #1e293b; border-radius: 3px; padding: 0 3px; user-select: none; }
-
+        .redacted { background-color: #1e293b; color: transparent; border-radius: 3px; padding: 0 3px; user-select: none; overflow-wrap: anywhere; word-break: break-word; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-        .mc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .mc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
         @media (max-width: 520px) { .mc-grid { grid-template-columns: 1fr; } }
-        .mc-btn { background: #f8fafc; border: 2px solid #cbd5e1; color: var(--text); padding: 12px; border-radius: 8px; font-size: 0.98rem; font-weight: 600; cursor: pointer; transition: 0.15s; text-align: left; }
+        .mc-btn { background: #f8fafc; border: 2px solid #cbd5e1; color: var(--text); padding: 11px 14px; border-radius: 8px; font-size: 0.96rem; font-weight: 600; cursor: pointer; transition: 0.15s; text-align: left; }
         .mc-btn:hover:not(:disabled) { border-color: var(--primary); background: #eff6ff; }
         .mc-btn.correct { background: #dcfce7; border-color: var(--success); color: #14532d; }
         .mc-btn.wrong { background: #fee2e2; border-color: var(--danger); color: #7f1d1d; }
 
-        .text-input-group { display: flex; gap: 8px; margin-bottom: 15px; }
+        .text-input-group { display: flex; gap: 8px; margin-bottom: 14px; }
         .controls-row { display: flex; gap: 8px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
 
-        .feedback { padding: 14px; border-radius: 10px; margin-bottom: 15px; font-weight: 600; text-align: center; }
+        .feedback { padding: 13px; border-radius: 10px; margin-bottom: 14px; font-weight: 600; text-align: center; }
         .feedback.win { background: #dcfce7; color: #14532d; }
         .feedback.lose { background: #fee2e2; color: #7f1d1d; }
+        .feedback.tie { background: #fae8ff; color: #86198f; }
 
-        .scoreboard { margin-top: 18px; border-top: 2px solid #e2e8f0; padding-top: 12px; }
+        .scoreboard { margin-top: 18px; border-top: 2px solid #e2e8f0; padding-top: 14px; }
         .score-list { display: flex; flex-wrap: wrap; gap: 8px; }
-        .score-card { background: #f1f5f9; padding: 7px 12px; border-radius: 8px; font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+        .score-card { background: #f1f5f9; padding: 7px 12px; border-radius: 8px; font-size: 0.9rem; }
         .score-card.active { border: 2px solid var(--primary); background: #eff6ff; font-weight: bold; }
 
-        .podium-box { text-align: center; padding: 20px 10px; }
-        .podium-list { max-width: 420px; margin: 16px auto; text-align: left; display: flex; flex-direction: column; gap: 8px; }
-        .podium-item { display: flex; justify-content: space-between; padding: 12px 16px; border-radius: 10px; background: #f1f5f9; font-weight: 600; }
-        .podium-item.first { background: #fef3c7; border: 2px solid #f59e0b; font-size: 1.1rem; }
+        .podium { text-align: center; padding: 15px 0; }
+        .podium-item { background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 1.05rem; }
+        .podium-item.first { background: #fef9c3; border-color: #eab308; font-weight: bold; font-size: 1.15rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <div class="header-title">
-            <h1>Veni, vidi, <span>wiki</span></h1>
-            <div class="subtitle">Errate den Wikipedia-Eintrag – weniger Hinweise = mehr Punkte!</div>
-        </div>
-        <button type="button" id="sound-toggle-btn" class="sound-btn">🔊 Ton an</button>
+        <h1>Veni, vidi, <span>wiki</span></h1>
+        <div class="subtitle" id="ui-subtitle">Errate den Wikipedia-Eintrag – je weniger Hinweise, desto mehr Punkte!</div>
+        <button type="button" class="sound-toggle" id="sound-btn">🔊 Ton an</button>
     </header>
 
-    <!-- STARTMENÜ -->
     <div id="setup-screen">
         <div class="setup-grid">
             <div>
-                <label for="lang-select">Sprache der Artikel</label>
+                <label for="lang-select" id="lbl-lang">Sprache</label>
                 <select id="lang-select">
-                    <option value="de" selected>Deutsch (Standard)</option>
-                    <option value="en">Englisch</option>
-                    <option value="fr">Französisch</option>
-                    <option value="it">Italienisch</option>
+                    <option value="de" selected>Deutsch</option>
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                    <option value="it">Italiano</option>
+                    <option value="es">Español</option>
                 </select>
             </div>
             <div>
-                <label for="category-select">Kategorie</label>
+                <label for="category-select" id="lbl-cat">Kategorie</label>
                 <select id="category-select">
-                    <option value="all" selected>🎲 Quer-durch (Alle Kategorien)</option>
-                    <option value="people">👤 Persönlichkeiten</option>
-                    <option value="places">🌍 Länder, Städte & Bauwerke</option>
-                    <option value="nature">🦁 Tiere & Natur</option>
-                    <option value="culture">🎬 Film, Musik & Kultur</option>
-                    <option value="science">🔬 Wissenschaft & Erfindung</option>
-                    <option value="sport">⚽ Sport</option>
-                    <option value="food">🧀 Essen & Trinken</option>
+                    <option value="all" selected id="opt-cat-all">🎲 Quer-durch</option>
+                    <option value="people" id="opt-cat-people">👤 Persönlichkeiten</option>
+                    <option value="places" id="opt-cat-places">🌍 Orte & Bauwerke</option>
+                    <option value="nature" id="opt-cat-nature">🦁 Tiere & Natur</option>
+                    <option value="culture" id="opt-cat-culture">🎬 Kultur & Musik</option>
+                    <option value="science" id="opt-cat-science">🔬 Wissenschaft</option>
+                    <option value="sport" id="opt-cat-sport">⚽ Sport</option>
+                    <option value="food" id="opt-cat-food">🍕 Essen & Trinken</option>
                 </select>
             </div>
             <div>
-                <label for="difficulty-select">Schwierigkeitsgrad</label>
+                <label for="difficulty-select" id="lbl-diff">Schwierigkeitsgrad</label>
                 <select id="difficulty-select">
-                    <option value="easy">🟢 Leicht</option>
-                    <option value="medium" selected>🟡 Mittel (Standard)</option>
-                    <option value="hard">🔴 Experte</option>
+                    <option value="easy" id="opt-diff-easy">Leicht</option>
+                    <option value="medium" selected id="opt-diff-medium">Mittel</option>
+                    <option value="expert" id="opt-diff-expert">Experte</option>
                 </select>
             </div>
             <div>
-                <label for="input-mode">Rate-Modus</label>
+                <label for="input-mode" id="lbl-mode">Rate-Modus</label>
                 <select id="input-mode">
-                    <option value="mc" selected>Multiple Choice (4 Auswahlmöglichkeiten)</option>
-                    <option value="text">Freies Textfeld</option>
+                    <option value="mc" selected id="opt-mode-mc">Multiple Choice</option>
+                    <option value="text" id="opt-mode-text">Freies Textfeld</option>
                 </select>
             </div>
             <div>
-                <label for="rounds-input">Runden pro Spieler</label>
+                <label for="rounds-input" id="lbl-rounds">Runden pro Spieler</label>
                 <input type="number" id="rounds-input" value="10" min="1" max="100">
             </div>
             <div>
-                <label for="timer-select">Timer pro Runde</label>
+                <label for="timer-select" id="lbl-timer">Timer pro Runde</label>
                 <select id="timer-select">
-                    <option value="30">30 Sekunden</option>
-                    <option value="45" selected>45 Sekunden</option>
-                    <option value="60">60 Sekunden</option>
-                    <option value="0">Kein Timer</option>
+                    <option value="30">30 s</option>
+                    <option value="45" selected>45 s</option>
+                    <option value="60">60 s</option>
+                    <option value="0" id="opt-timer-off">Kein Timer</option>
                 </select>
             </div>
         </div>
 
         <div class="player-setup">
-            <label for="player-name-input">Spielende (Solo = 1 Name, Multiplayer = mehrere Namen hinzufügen)</label>
-            <div class="player-input-row">
-                <input type="text" id="player-name-input" placeholder="Name eingeben & + drücken..." maxlength="22" autocomplete="off">
-                <button type="button" id="add-player-btn" class="btn btn-small">+ Hinzufügen</button>
+            <label id="lbl-players">Spieler (Solo = 1 Spieler, Multiplayer = mehrere Namen)</label>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="player-name-input" placeholder="Spielername..." maxlength="20">
+                <button type="button" class="btn btn-small" id="add-player-btn">+ Hinzufügen</button>
             </div>
             <div class="player-tags" id="player-tags"></div>
         </div>
 
-        <button type="button" id="start-game-btn" class="btn">Spiel starten</button>
+        <button type="button" class="btn" id="start-game-btn">Spiel starten</button>
     </div>
 
-    <!-- SPIELFELD -->
     <div id="game-screen" class="hidden">
-        <div id="tiebreaker-banner" class="tiebreaker-banner hidden">⚡ STECHEN! Entscheidungsrunde der Punktgleichen</div>
-
         <div class="status-bar">
             <div class="status-left">
-                <strong id="current-player-display">Spieler 1</strong> · <span id="category-badge">Quer-durch</span>
+                <span id="ui-turn">Am Zug:</span> <strong id="current-player-display">Spieler 1</strong>
+                <span>|</span>
+                <span id="round-display">Runde 1 / 10</span>
+                <span class="badge badge-tie hidden" id="tie-badge">⚡ Stechen</span>
             </div>
-            <div class="status-badges">
-                <span class="badge badge-round" id="round-badge">R 1/10</span>
-                <span class="badge badge-points" id="points-badge">3 Pkt.</span>
+            <div class="status-right">
+                <span class="badge badge-points" id="points-badge">Punkte: 3</span>
                 <span class="badge badge-timer" id="timer-badge">⏱ 45s</span>
             </div>
         </div>
 
-        <div class="wiki-box" id="wiki-text">
-            Lade Wikipedia-Artikel...
-        </div>
-
+        <div class="wiki-box" id="wiki-text">Lade...</div>
         <div id="feedback-box" class="feedback hidden"></div>
-
         <div id="mc-area" class="mc-grid hidden"></div>
 
         <div id="text-area" class="text-input-group hidden">
-            <input type="text" id="guess-input" placeholder="Gesuchten Begriff eintippen..." autocomplete="off">
-            <button type="button" id="submit-guess-btn" class="btn btn-small">Prüfen</button>
+            <input type="text" id="guess-input" placeholder="Begriff eintippen...">
+            <button type="button" class="btn btn-small" id="submit-text-btn">Prüfen</button>
         </div>
 
         <div class="controls-row">
-            <button type="button" id="hint-btn" class="btn btn-secondary btn-small">🔍 Mehr Text (-1 Pkt.)</button>
-            <button type="button" id="next-round-btn" class="btn btn-small hidden">Weiter ➔</button>
+            <button type="button" id="hint-btn" class="btn btn-secondary btn-small">🔍 Weiteren Text (-1 Pkt.)</button>
+            <button type="button" id="next-round-btn" class="btn btn-small hidden">Nächste Runde ➔</button>
             <button type="button" id="menu-btn" class="btn btn-secondary btn-small">Menü</button>
         </div>
 
         <div class="scoreboard">
-            <div style="font-size: 0.85rem; color: var(--muted); margin-bottom: 6px;">Punktestand:</div>
+            <div style="font-size: 0.85rem; color: var(--muted); margin-bottom: 6px;" id="ui-scores">Punktestand:</div>
             <div class="score-list" id="scoreboard-list"></div>
         </div>
     </div>
 
-    <!-- SIEGEREHRUNG -->
-    <div id="end-screen" class="podium-box hidden">
-        <h2>🏆 Spiel beendet!</h2>
-        <div id="winner-announcement" style="font-size: 1.15rem; font-weight: 700; color: var(--primary); margin-bottom: 10px;"></div>
-        <div class="podium-list" id="podium-list"></div>
-        <div style="max-width: 300px; margin: 20px auto 0;">
-            <button type="button" id="restart-btn" class="btn">Neues Spiel</button>
+    <div id="end-screen" class="hidden">
+        <div class="podium">
+            <h2 id="ui-end-title">🏆 Spielende & Siegerehrung</h2>
+            <div id="podium-list" style="margin: 18px 0;"></div>
+            <button type="button" class="btn" id="play-again-btn">Neues Spiel starten</button>
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    // --- DATENBANK MIT UNTERGRUPPEN & SCHWIERIGKEITSGRADEN ---
-    const DATABASE = {
-        people: {
-            label: "Persönlichkeiten",
-            clusters: [
-                {
-                    easy: ["Albert Einstein", "Marie Curie", "Isaac Newton", "Charles Darwin", "Galileo Galilei", "Nikola Tesla", "Stephen Hawking"],
-                    medium: ["Johannes Kepler", "Max Planck", "Alexander von Humboldt", "Sigmund Freud", "Carl Gustav Jung", "Louis Pasteur", "Robert Koch"],
-                    hard: ["Lise Meitner", "Niels Bohr", "Werner Heisenberg", "Erwin Schrödinger", "Rosalind Franklin", "Ada Lovelace", "Alan Turing"]
-                },
-                {
-                    easy: ["Wolfgang Amadeus Mozart", "Ludwig van Beethoven", "Leonardo da Vinci", "Pablo Picasso", "Vincent van Gogh", "Johann Sebastian Bach"],
-                    medium: ["Frida Kahlo", "Rembrandt van Rijn", "Claude Monet", "Salvador Dalí", "Franz Schubert", "Richard Wagner", "Giuseppe Verdi"],
-                    hard: ["Artemisia Gentileschi", "Hildegard von Bingen", "Albrecht Dürer", "Caspar David Friedrich", "Edvard Munch", "Gustav Klimt", "Paul Klee"]
-                },
-                {
-                    easy: ["Nelson Mandela", "Kleopatra VII.", "Julius Caesar", "Napoleon Bonaparte", "Abraham Lincoln", "Mahatma Gandhi", "Angela Merkel"],
-                    medium: ["Winston Churchill", "John F. Kennedy", "Martin Luther King", "Jeanne d'Arc", "Katharina die Große", "Otto von Bismarck", "Michail Gorbatschow"],
-                    hard: ["Simón Bolívar", "Mustafa Kemal Atatürk", "Golda Meir", "Willy Brandt", "Konrad Adenauer", "Charles de Gaulle", "Hannibal"]
-                },
-                {
-                    easy: ["William Shakespeare", "Johann Wolfgang von Goethe", "Astrid Lindgren", "Mark Twain", "Agatha Christie"],
-                    medium: ["Friedrich Schiller", "Franz Kafka", "Hermann Hesse", "George Orwell", "Ernest Hemingway", "Jane Austen", "Charles Dickens"],
-                    hard: ["Fjodor Michailowitsch Dostojewski", "Leo Tolstoi", "Virginia Woolf", "Friedrich Dürrenmatt", "Max Frisch", "Heinrich Heine"]
-                }
-            ]
-        },
-        places: {
-            label: "Orte & Bauwerke",
-            clusters: [
-                {
-                    easy: ["Eiffelturm", "Kolosseum", "Pyramiden von Gizeh", "Chinesische Mauer", "Freiheitsstatue", "Taj Mahal", "Schiefer Turm von Pisa"],
-                    medium: ["Machu Picchu", "Akropolis (Athen)", "Stonehenge", "Sagrada Família", "Brandenburger Tor", "Schloss Neuschwanstein", "Louvre"],
-                    hard: ["Angkor Wat", "Alhambra", "Petra (Jordanien)", "Hagia Sophia", "Kapellbrücke", "Chichén Itzá", "Burj Khalifa"]
-                },
-                {
-                    easy: ["Schweiz", "Deutschland", "Frankreich", "Italien", "Spanien", "Japan", "Australien", "Vereinigte Staaten", "Brasilien", "Ägypten"],
-                    medium: ["Island", "Norwegen", "Kanada", "Neuseeland", "Peru", "Mexiko", "Indien", "Südafrika", "Griechenland", "Schweden"],
-                    hard: ["Bhutan", "Kasachstan", "Madagaskar", "Estland", "Slowenien", "Uruguay", "Mongolei", "Oman", "Costa Rica"]
-                },
-                {
-                    easy: ["New York City", "London", "Paris", "Rom", "Tokio", "Berlin", "Zürich", "Wien"],
-                    medium: ["Venedig", "Barcelona", "Amsterdam", "Prag", "Istanbul", "Sydney", "Rio de Janeiro", "San Francisco"],
-                    hard: ["Reykjavík", "Kyōto", "Dubrovnik", "Marrakesch", "Buenos Aires", "Singapur", "Lissabon", "Genf"]
-                },
-                {
-                    easy: ["Mount Everest", "Matterhorn", "Mont Blanc", "Ätna", "Vesuv", "Kilimandscharo"],
-                    medium: ["Eiger", "Zugspitze", "Fuji (Vulkan)", "Grand Canyon", "Niagarafälle", "Sahara", "Amazonas"],
-                    hard: ["K2", "Denali", "Aconcagua", "Eyjafjallajökull", "Rheinfall", "Aletschgletscher", "Bodensee", "Vierwaldstättersee"]
-                }
-            ]
-        },
-        nature: {
-            label: "Tiere & Natur",
-            clusters: [
-                {
-                    easy: ["Löwe", "Tiger", "Elefant", "Eisbär", "Braunbär", "Wolf", "Gepard", "Giraffe", "Zebra", "Riesenpanda"],
-                    medium: ["Luchs", "Steinbock", "Murmeltier", "Gämse", "Koala", "Kängurus", "Schimpanse", "Gorilla", "Orang-Utans", "Nilpferd"],
-                    hard: ["Schneeleopard", "Vielfraß", "Tapire", "Schnabeltier", "Gürteltiere", "Erdmännchen", "Nasenbär", "Okapi"]
-                },
-                {
-                    easy: ["Pinguine", "Flamingo", "Adler", "Uhu", "Strauß (Vogel)", "Kolibris", "Storch", "Schwan"],
-                    medium: ["Eisvogel", "Spechte", "Papageien", "Pelikan", "Albatrosse", "Kranich", "Kuckuck", "Falke"],
-                    hard: ["Bartgeier", "Wiedehopf", "Kiwis (Vögel)", "Tukan", "Sekretär (Vogel)", "Papageitaucher", "Mauersegler"]
-                },
-                {
-                    easy: ["Blauwal", "Delfine", "Weißer Hai", "Kraken", "Seepferdchen", "Quallen", "Clownfische"],
-                    medium: ["Schwertwal", "Seekühe", "Mantarochen", "Hummer", "Pottwal", "Hammerhaie", "Muränen"],
-                    hard: ["Narwal", "Nautilus (Gattung)", "Lachs", "Aale", "Kugelfische", "Beluga (Wal)"]
-                },
-                {
-                    easy: ["Sonnenblume", "Edelweiß", "Eiche", "Kaktus", "Bambus", "Löwenzahn", "Rose"],
-                    medium: ["Mammutbäume", "Ginkgo", "Orchideen", "Venusfliegenfalle", "Edelkastanie", "Lavendel", "Enzian"],
-                    hard: ["Baobab", "Rafflesia", "Eibe", "Arnika", "Seerose", "Mistel", "Korkeiche"]
-                }
-            ]
-        },
-        culture: {
-            label: "Film, Musik & Kultur",
-            clusters: [
-                {
-                    easy: ["Titanic (1997)", "Star Wars", "Harry Potter", "Der Herr der Ringe", "Jurassic Park", "James Bond", "Forrest Gump"],
-                    medium: ["Der Pate", "Pulp Fiction", "Inception", "Matrix (Film)", "Zurück in die Zukunft", "Schindlers Liste", "Casablanca (Film)"],
-                    hard: ["Metropolis (Film)", "Uhrwerk Orange (Film)", "2001: Odyssee im Weltraum", "Psycho (1960)", "Citizen Kane", "Die fabelhafte Welt der Amélie"]
-                },
-                {
-                    easy: ["The Beatles", "Queen (Band)", "ABBA", "The Rolling Stones", "Michael Jackson", "Elvis Presley", "Madonna (Künstlerin)"],
-                    medium: ["Pink Floyd", "Nirvana (Band)", "AC/DC", "U2 (Band)", "David Bowie", "Bob Marley", "Led Zeppelin"],
-                    hard: ["Kraftwerk (Band)", "Depeche Mode", "Radiohead", "The Doors", "Johnny Cash", "Aretha Franklin", "Bob Dylan"]
-                },
-                {
-                    easy: ["Mona Lisa", "Der Schrei", "Die Zauberflöte", "Sherlock Holmes", "Don Quijote", "Pinocchio"],
-                    medium: ["Guernica (Bild)", "Das Mädchen mit dem Perlenohrgehänge", "Carmen (Oper)", "Der Nussknacker", "Faust. Eine Tragödie", "Robin Hood"],
-                    hard: ["Die Nachtwache", "Der Kuss (Klimt)", "La Traviata", "Der Ring des Nibelungen", "Die Verwandlung", "Der kleine Prinz"]
-                }
-            ]
-        },
-        science: {
-            label: "Wissenschaft & Erfindung",
-            clusters: [
-                {
-                    easy: ["Glühlampe", "Telefon", "Buchdruck", "Internet", "Kompass", "Fernsehen", "Automobil", "Fahrrad"],
-                    medium: ["Dampfmaschine", "Telegrafie", "Fotografie", "Radar", "Laser", "Mikroskop", "Teleskop", "Uhr"],
-                    hard: ["Transistor", "Rechenschieber", "Sextant", "Lochkarte", "Gyroskop", "Barometer", "Thermometer"]
-                },
-                {
-                    easy: ["Penicillin", "Impfung", "Röntgenstrahlung", "Desoxyribonukleinsäure", "Blutkreislauf", "Vitamin"],
-                    medium: ["Insulin", "Anästhesie", "Antibiotikum", "Magnetresonanztomographie", "Ultraschall", "Stethoskop"],
-                    hard: ["CRISPR", "Elektrokardiogramm", "Homöopathie", "Bakteriophagen", "Stammzelle", "Placebo"]
-                },
-                {
-                    easy: ["Internationale Raumstation", "Mondlandung", "Schwarzes Loch", "Sonnensystem", "Milchstraße", "Mars (Planet)", "Saturn (Planet)"],
-                    medium: ["Hubble-Weltraumteleskop", "Apollo 11", "Sputnik 1", "Komet", "Supernova", "Jupiter (Planet)", "Venus (Planet)"],
-                    hard: ["James-Webb-Weltraumteleskop", "Voyager 1", "Urknall", "Exoplanet", "Neutronenstern", "Pulsar", "Lichtjahr"]
-                }
-            ]
-        },
-        sport: {
-            label: "Sport",
-            clusters: [
-                {
-                    easy: ["Fußball", "Tennis", "Basketball", "Handball", "Volleyball", "Golf (Sport)", "Eishockey", "Tischtennis"],
-                    medium: ["Rugby", "Baseball", "American Football", "Badminton", "Wasserball", "Feldhockey", "Faustball"],
-                    hard: ["Curling", "Kricket", "Polo (Sport)", "Squash", "Lacrosse", "Boccia", "Pétanque"]
-                },
-                {
-                    easy: ["Ski Alpin", "Skispringen", "Biathlon", "Snowboard", "Eiskunstlauf", "Bob (Sport)", "Skilanglauf"],
-                    medium: ["Rennrodeln", "Eisschnelllauf", "Nordische Kombination", "Skeleton (Sportart)", "Freestyle-Skiing"],
-                    hard: ["Shorttrack", "Telemarken", "Skibergsteigen", "Bandy", "Eisstockschießen"]
-                },
-                {
-                    easy: ["Roger Federer", "Lionel Messi", "Cristiano Ronaldo", "Michael Schumacher", "Usain Bolt", "Muhammad Ali"],
-                    medium: ["Rafael Nadal", "Novak Đoković", "Pelé", "Diego Maradona", "Lewis Hamilton", "Ayrton Senna", "Michael Phelps"],
-                    hard: ["Bernhard Russi", "Pirmin Zurbriggen", "Vreni Schneider", "Steffi Graf", "Boris Becker", "Eddy Merckx", "Niki Lauda"]
-                },
-                {
-                    easy: ["Olympische Spiele", "Fußball-Weltmeisterschaft", "Tour de France", "Formel 1", "Wimbledon Championships"],
-                    medium: ["Lauberhornrennen", "Hahnenkammrennen", "Super Bowl", "UEFA Champions League", "Giro d’Italia"],
-                    hard: ["24-Stunden-Rennen von Le Mans", "Ryder Cup", "America’s Cup", "Vierschanzentournee", "Spengler Cup"]
-                }
-            ]
-        },
-        food: {
-            label: "Essen & Trinken",
-            clusters: [
-                {
-                    easy: ["Pizza", "Fondue", "Raclette", "Sushi", "Spaghetti", "Hamburger", "Rösti", "Lasagne"],
-                    medium: ["Paella", "Risotto", "Gulasch", "Tapas", "Wiener Schnitzel", "Sauerkraut", "Falafel", "Hummus"],
-                    hard: ["Bouillabaisse", "Zürcher Geschnetzeltes", "Borschtsch", "Ceviche", "Kimchi", "Dim Sum", "Ratatouille"]
-                },
-                {
-                    easy: ["Emmentaler", "Gruyère (Käse)", "Mozzarella", "Parmesan", "Gouda (Käse)", "Camembert", "Feta"],
-                    medium: ["Appenzeller (Käse)", "Tilsiter", "Brie (Käse)", "Roquefort", "Gorgonzola", "Mascarpone", "Ricotta"],
-                    hard: ["Sbrinz", "Tête de Moine", "Vacherin Mont-d’Or", "Manchego", "Halloumi", "Comté (Käse)"]
-                },
-                {
-                    easy: ["Kaffee", "Tee", "Bier", "Wein", "Champagner", "Kakao (Getränk)", "Mineralwasser"],
-                    medium: ["Espresso", "Cappuccino", "Matcha", "Whisky", "Apfelwein", "Mate-Tee", "Limonade"],
-                    hard: ["Absinth", "Sake", "Grappa", "Kirschwasser", "Kombucha", "Kefir", "Portwein"]
-                },
-                {
-                    easy: ["Schokolade", "Croissant", "Tiramisu", "Apfelstrudel", "Brezel", "Pfannkuchen", "Baguette"],
-                    medium: ["Schwarzwälder Kirschtorte", "Sachertorte", "Bündner Nusstorte", "Baklava", "Macaron", "Lebkuchen"],
-                    hard: ["Zuger Kirschtorte", "Engadiner Nusstorte", "Crème brûlée", "Panna cotta", "Panettone", "Stollen (Gebäck)"]
-                }
-            ]
-        }
-    };
+(function() {
+    if (typeof WIKI_DATA === 'undefined') {
+        alert('Fehler: daten.js wurde nicht gefunden. Bitte stelle sicher, dass index.html und daten.js im selben Ordner liegen.');
+        return;
+    }
 
-    // --- ZUSTANDSVARIABLEN ---
-    let players = [{ name: "Spieler 1", score: 0, isPlaceholder: true }];
+    let currentLang = 'de';
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    let players = [{ name: 'Spieler 1', score: 0 }];
     let activePlayerIndices = [];
     let turnPointer = 0;
-    let totalRoundsPerPlayer = 10;
-    let currentRoundNumber = 1;
-    let isTiebreaker = false;
+    let totalRounds = 10;
+    let currentRound = 1;
+    let isTieBreaker = false;
+    let sessionUsed = new Set();
 
-    let sessionUsedTerms = new Set();
-    let currentTargetDe = "";
-    let currentDisplayTitle = "";
-    let currentCategoryKey = "";
+    let currentTargetDe = '';
+    let currentDisplayTitle = '';
+    let currentCatKey = '';
     let currentCluster = null;
-    let paragraphs = [];
+    let textChunks = [];
     let revealedCount = 1;
     let possiblePoints = 3;
     let roundActive = false;
     let timerInterval = null;
     let timeLeft = 45;
-    let soundEnabled = true;
-    let audioCtx = null;
 
-    // --- ELEMENTE REFERENZIEREN ---
-    const playerNameInput = document.getElementById("player-name-input");
-    const addPlayerBtn = document.getElementById("add-player-btn");
-    const playerTagsContainer = document.getElementById("player-tags");
-    const startGameBtn = document.getElementById("start-game-btn");
-    const soundToggleBtn = document.getElementById("sound-toggle-btn");
-    const hintBtn = document.getElementById("hint-btn");
-    const nextRoundBtn = document.getElementById("next-round-btn");
-    const menuBtn = document.getElementById("menu-btn");
-    const restartBtn = document.getElementById("restart-btn");
-    const guessInput = document.getElementById("guess-input");
-    const submitGuessBtn = document.getElementById("submit-guess-btn");
+    function t(key) {
+        const dict = WIKI_DATA.i18n[currentLang] || WIKI_DATA.i18n.de;
+        return dict[key] || WIKI_DATA.i18n.de[key] || key;
+    }
 
-    // --- SOUND-SYSTEM (WEB AUDIO API) ---
+    function applyTranslations() {
+        currentLang = document.getElementById('lang-select').value;
+        document.documentElement.lang = currentLang;
+        document.getElementById('ui-subtitle').textContent = t('subtitle');
+        document.getElementById('sound-btn').textContent = soundEnabled ? t('soundOn') : t('soundOff');
+        document.getElementById('lbl-lang').textContent = t('langLabel');
+        document.getElementById('lbl-cat').textContent = t('catLabel');
+        document.getElementById('opt-cat-all').textContent = t('catAll');
+        document.getElementById('opt-cat-people').textContent = t('catPeople');
+        document.getElementById('opt-cat-places').textContent = t('catPlaces');
+        document.getElementById('opt-cat-nature').textContent = t('catNature');
+        document.getElementById('opt-cat-culture').textContent = t('catCulture');
+        document.getElementById('opt-cat-science').textContent = t('catScience');
+        document.getElementById('opt-cat-sport').textContent = t('catSport');
+        document.getElementById('opt-cat-food').textContent = t('catFood');
+        document.getElementById('lbl-diff').textContent = t('diffLabel');
+        document.getElementById('opt-diff-easy').textContent = t('diffEasy');
+        document.getElementById('opt-diff-medium').textContent = t('diffMedium');
+        document.getElementById('opt-diff-expert').textContent = t('diffExpert');
+        document.getElementById('lbl-mode').textContent = t('modeLabel');
+        document.getElementById('opt-mode-mc').textContent = t('modeMc');
+        document.getElementById('opt-mode-text').textContent = t('modeText');
+        document.getElementById('lbl-rounds').textContent = t('roundsLabel');
+        document.getElementById('lbl-timer').textContent = t('timerLabel');
+        document.getElementById('opt-timer-off').textContent = t('timerOff');
+        document.getElementById('lbl-players').textContent = t('playersLabel');
+        document.getElementById('player-name-input').placeholder = t('playerPlaceholder');
+        document.getElementById('add-player-btn').textContent = t('addBtn');
+        document.getElementById('start-game-btn').textContent = t('startBtn');
+        document.getElementById('ui-turn').textContent = t('turnLabel');
+        document.getElementById('tie-badge').textContent = t('tieBreaker');
+        document.getElementById('guess-input').placeholder = t('guessPlaceholder');
+        document.getElementById('submit-text-btn').textContent = t('checkBtn');
+        document.getElementById('hint-btn').textContent = t('hintBtn');
+        document.getElementById('next-round-btn').textContent = t('nextBtn');
+        document.getElementById('menu-btn').textContent = t('menuBtn');
+        document.getElementById('ui-scores').textContent = t('scoresLabel');
+        document.getElementById('ui-end-title').textContent = t('endTitle');
+        document.getElementById('play-again-btn').textContent = t('playAgainBtn');
+
+        if (players.length === 1 && ['Spieler 1', 'Player 1', 'Joueur 1', 'Giocatore 1', 'Jugador 1'].includes(players[0].name)) {
+            players[0].name = t('defaultPlayer');
+        }
+        renderPlayerTags();
+    }
+
+    // Spieler-Gedächtnis (localStorage)
+    function getPlayerHistory(playerName) {
+        try {
+            const key = 'vw_hist_' + playerName.trim().toLowerCase();
+            const raw = localStorage.getItem(key);
+            return raw ? new Set(JSON.parse(raw)) : new Set();
+        } catch (e) {
+            return new Set();
+        }
+    }
+
+    function savePlayerHistory(playerName, term) {
+        try {
+            const key = 'vw_hist_' + playerName.trim().toLowerCase();
+            const hist = getPlayerHistory(playerName);
+            hist.add(term);
+            localStorage.setItem(key, JSON.stringify(Array.from(hist)));
+        } catch (e) {}
+    }
+
+    // Web Audio API Soundeffekte
     function playSound(type) {
         if (!soundEnabled) return;
         try {
-            if (!audioCtx) {
-                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-                audioCtx = new AudioContextClass();
-            }
-            if (audioCtx.state === "suspended") audioCtx.resume();
-
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
 
-            if (type === "win") {
-                osc.type = "triangle";
+            if (type === 'win') {
+                osc.type = 'triangle';
                 osc.frequency.setValueAtTime(523.25, now);
                 osc.frequency.setValueAtTime(659.25, now + 0.1);
                 osc.frequency.setValueAtTime(783.99, now + 0.2);
                 gain.gain.setValueAtTime(0.18, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
                 osc.start(now);
                 osc.stop(now + 0.45);
-            } else if (type === "lose") {
-                osc.type = "sawtooth";
+            } else if (type === 'lose') {
+                osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(220, now);
                 osc.frequency.linearRampToValueAtTime(140, now + 0.35);
                 gain.gain.setValueAtTime(0.14, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
                 osc.start(now);
-                osc.stop(now + 0.38);
-            } else if (type === "hint") {
-                osc.type = "sine";
+                osc.stop(now + 0.35);
+            } else if (type === 'hint') {
+                osc.type = 'sine';
                 osc.frequency.setValueAtTime(440, now);
-                osc.frequency.exponentialRampToValueAtTime(580, now + 0.12);
-                gain.gain.setValueAtTime(0.12, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
                 osc.start(now);
-                osc.stop(now + 0.14);
-            } else if (type === "tick") {
-                osc.type = "sine";
+                osc.stop(now + 0.15);
+            } else if (type === 'tick') {
+                osc.type = 'sine';
                 osc.frequency.setValueAtTime(880, now);
-                gain.gain.setValueAtTime(0.07, now);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+                gain.gain.setValueAtTime(0.06, now);
+                gain.gain.exponentialRampToValueAtTime(0.005, now + 0.06);
                 osc.start(now);
                 osc.stop(now + 0.06);
-            } else if (type === "fanfare") {
-                const notes = [523.25, 659.25, 783.99, 1046.50];
-                notes.forEach((freq, i) => {
-                    const o = audioCtx.createOscillator();
-                    const g = audioCtx.createGain();
-                    o.type = "triangle";
-                    o.connect(g);
-                    g.connect(audioCtx.destination);
-                    o.frequency.setValueAtTime(freq, now + i * 0.12);
-                    g.gain.setValueAtTime(0.18, now + i * 0.12);
-                    g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.35);
-                    o.start(now + i * 0.12);
-                    o.stop(now + i * 0.12 + 0.35);
+            } else if (type === 'fanfare') {
+                osc.type = 'triangle';
+                [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                    osc.frequency.setValueAtTime(freq, now + i * 0.12);
                 });
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+                osc.start(now);
+                osc.stop(now + 0.7);
             }
         } catch (e) {}
     }
 
-    soundToggleBtn.addEventListener("click", function() {
-        soundEnabled = !soundEnabled;
-        soundToggleBtn.textContent = soundEnabled ? "🔊 Ton an" : "🔇 Ton aus";
-    });
+    function addPlayer() {
+        const input = document.getElementById('player-name-input');
+        const name = input.value.trim();
+        if (!name || players.length >= 8) return;
+        const defaults = ['Spieler 1', 'Player 1', 'Joueur 1', 'Giocatore 1', 'Jugador 1'];
+        if (players.length === 1 && defaults.includes(players[0].name)) {
+            players = [];
+        }
+        players.push({ name: name, score: 0 });
+        input.value = '';
+        renderPlayerTags();
+    }
 
-    // --- SPIELER-VERWALTUNG ---
     function renderPlayerTags() {
-        playerTagsContainer.innerHTML = "";
-        players.forEach(function(p, idx) {
-            const tag = document.createElement("div");
-            tag.className = "player-tag";
-
-            const span = document.createElement("span");
-            span.textContent = p.name;
+        const container = document.getElementById('player-tags');
+        container.innerHTML = '';
+        players.forEach((p, idx) => {
+            const histCount = getPlayerHistory(p.name).size;
+            const tag = document.createElement('div');
+            tag.className = 'player-tag';
+            const span = document.createElement('span');
+            span.innerHTML = `${p.name} ${histCount > 0 ? `<small>(${histCount} ${t('playedCount')})</small>` : ''}`;
             tag.appendChild(span);
-
             if (players.length > 1) {
-                const delBtn = document.createElement("button");
-                delBtn.type = "button";
-                delBtn.textContent = "×";
-                delBtn.setAttribute("aria-label", p.name + " entfernen");
-                delBtn.addEventListener("click", function() {
+                const delBtn = document.createElement('button');
+                delBtn.type = 'button';
+                delBtn.textContent = '×';
+                delBtn.onclick = () => {
                     players.splice(idx, 1);
                     renderPlayerTags();
-                });
+                };
                 tag.appendChild(delBtn);
             }
-            playerTagsContainer.appendChild(tag);
+            container.appendChild(tag);
         });
     }
 
-    function handleAddPlayer() {
-        const rawName = playerNameInput.value.trim();
-        if (!rawName) {
-            playerNameInput.focus();
-            return;
-        }
-        if (players.length >= 10) return;
-
-        // Platzhalter "Spieler 1" beim ersten echten Eintrag ersetzen
-        if (players.length === 1 && players[0].isPlaceholder) {
-            players = [];
-        }
-
-        players.push({ name: rawName, score: 0, isPlaceholder: false });
-        playerNameInput.value = "";
-        renderPlayerTags();
-        playerNameInput.focus();
-    }
-
-    addPlayerBtn.addEventListener("click", handleAddPlayer);
-    playerNameInput.addEventListener("keydown", function(e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            handleAddPlayer();
-        }
-    });
-
-    renderPlayerTags();
-
-    // --- SPIELABLAUF ---
     function startGame() {
-        // Falls noch Text im Eingabefeld steht, diesen direkt übernehmen
-        if (playerNameInput.value.trim() !== "") {
-            handleAddPlayer();
-        }
+        const pendingName = document.getElementById('player-name-input').value.trim();
+        if (pendingName) addPlayer();
 
         players.forEach(p => p.score = 0);
-        activePlayerIndices = players.map((_, idx) => idx);
+        activePlayerIndices = players.map((_, i) => i);
         turnPointer = 0;
-        currentRoundNumber = 1;
-        isTiebreaker = false;
+        currentRound = 1;
+        isTieBreaker = false;
+        totalRounds = Math.max(1, Math.min(100, parseInt(document.getElementById('rounds-input').value) || 10));
 
-        const roundsVal = parseInt(document.getElementById("rounds-input").value, 10);
-        totalRoundsPerPlayer = (isNaN(roundsVal) || roundsVal < 1) ? 10 : Math.min(100, roundsVal);
-
-        document.getElementById("setup-screen").classList.add("hidden");
-        document.getElementById("end-screen").classList.add("hidden");
-        document.getElementById("game-screen").classList.remove("hidden");
-        document.getElementById("tiebreaker-banner").classList.add("hidden");
-
+        document.getElementById('setup-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
         loadNextRound();
     }
 
-    startGameBtn.addEventListener("click", startGame);
-    restartBtn.addEventListener("click", function() {
-        document.getElementById("end-screen").classList.add("hidden");
-        document.getElementById("setup-screen").classList.remove("hidden");
-    });
-
-    menuBtn.addEventListener("click", function() {
-        clearInterval(timerInterval);
-        document.getElementById("game-screen").classList.add("hidden");
-        document.getElementById("end-screen").classList.add("hidden");
-        document.getElementById("setup-screen").classList.remove("hidden");
-    });
-
-    function getCurrentPlayerIndex() {
-        return activePlayerIndices[turnPointer];
+    function getCurrentPlayer() {
+        return players[activePlayerIndices[turnPointer]];
     }
 
-    function updateScoreboard() {
-        const list = document.getElementById("scoreboard-list");
-        const activeIdx = getCurrentPlayerIndex();
-        list.innerHTML = players.map((p, idx) => `
-            <div class="score-card ${idx === activeIdx ? 'active' : ''}">
-                ${escapeHtml(p.name)}: <strong>${p.score} Pkt.</strong>
+    function updateStatusUI() {
+        const p = getCurrentPlayer();
+        document.getElementById('current-player-display').textContent = p.name;
+        const tieBadge = document.getElementById('tie-badge');
+        const roundDisp = document.getElementById('round-display');
+        if (isTieBreaker) {
+            tieBadge.classList.remove('hidden');
+            roundDisp.textContent = t('tieBreaker');
+        } else {
+            tieBadge.classList.add('hidden');
+            roundDisp.textContent = `${t('roundLabel')} ${currentRound} / ${totalRounds}`;
+        }
+        document.getElementById('points-badge').textContent = `${t('pointsLabel')} ${possiblePoints}`;
+
+        const list = document.getElementById('scoreboard-list');
+        list.innerHTML = players.map((pl, idx) => `
+            <div class="score-card ${idx === activePlayerIndices[turnPointer] ? 'active' : ''}">
+                ${pl.name}: <strong>${pl.score} ${t('ptsShort')}</strong>
             </div>
-        `).join("");
+        `).join('');
     }
 
-    function escapeHtml(str) {
-        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    async function fetchDynamicWikiTerms(catKey) {
+        const wikiCat = WIKI_DATA.wikiCategories[catKey];
+        if (!wikiCat) return [];
+        try {
+            const url = `https://de.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=${encodeURIComponent(wikiCat)}&cmnamespace=0&cmlimit=50&format=json&origin=*`;
+            const res = await fetch(url);
+            const data = await res.json();
+            return (data.query?.categorymembers || []).map(m => m.title);
+        } catch (e) {
+            return [];
+        }
     }
 
     async function loadNextRound(retryCount = 0) {
@@ -629,304 +463,280 @@ document.addEventListener("DOMContentLoaded", function() {
         revealedCount = 1;
         possiblePoints = 3;
 
-        const currentIdx = getCurrentPlayerIndex();
-        document.getElementById("feedback-box").classList.add("hidden");
-        nextRoundBtn.classList.add("hidden");
-        hintBtn.classList.remove("hidden");
-        hintBtn.disabled = false;
-        document.getElementById("wiki-text").innerHTML = "<em>Suche passenden Wikipedia-Eintrag...</em>";
-        document.getElementById("mc-area").classList.add("hidden");
-        document.getElementById("text-area").classList.add("hidden");
+        document.getElementById('feedback-box').classList.add('hidden');
+        document.getElementById('next-round-btn').classList.add('hidden');
+        document.getElementById('hint-btn').classList.remove('hidden');
+        document.getElementById('hint-btn').disabled = false;
+        document.getElementById('mc-area').classList.add('hidden');
+        document.getElementById('text-area').classList.add('hidden');
+        document.getElementById('wiki-text').innerHTML = `<em>${t('loading')}</em>`;
 
-        document.getElementById("current-player-display").textContent = players[currentIdx].name;
-        document.getElementById("round-badge").textContent = isTiebreaker ? "Stechen" : `R ${currentRoundNumber}/${totalRoundsPerPlayer}`;
-        updatePointsBadge();
-        updateScoreboard();
+        updateStatusUI();
 
-        const selectedCat = document.getElementById("category-select").value;
-        const difficulty = document.getElementById("difficulty-select").value;
-        const catKeys = Object.keys(DATABASE);
-        currentCategoryKey = selectedCat === "all" ? catKeys[Math.floor(Math.random() * catKeys.length)] : selectedCat;
-        document.getElementById("category-badge").textContent = DATABASE[currentCategoryKey].label;
+        const selectedCat = document.getElementById('category-select').value;
+        const catKeys = Object.keys(WIKI_DATA.categories);
+        currentCatKey = selectedCat === 'all' ? catKeys[Math.floor(Math.random() * catKeys.length)] : selectedCat;
+        const diff = document.getElementById('difficulty-select').value;
+        const player = getCurrentPlayer();
+        const playerHist = getPlayerHistory(player.name);
 
-        const clusters = DATABASE[currentCategoryKey].clusters;
-        currentCluster = clusters[Math.floor(Math.random() * clusters.length)];
+        const clusters = WIKI_DATA.categories[currentCatKey];
+        let candidates = [];
 
-        let pool = (currentCluster[difficulty] || []).filter(item => !sessionUsedTerms.has(item));
-        if (pool.length === 0) {
-            const allClusterItems = [...(currentCluster.easy || []), ...(currentCluster.medium || []), ...(currentCluster.hard || [])];
-            pool = allClusterItems.filter(item => !sessionUsedTerms.has(item));
+        clusters.forEach(cl => {
+            const terms = cl[diff] || cl.medium || [];
+            terms.forEach(term => {
+                if (!sessionUsed.has(term) && !playerHist.has(term)) {
+                    candidates.push({ term, cluster: cl });
+                }
+            });
+        });
+
+        // Falls der persönliche Pool erschöpft ist, dynamisch aus Wikipedia nachladen
+        if (candidates.length === 0) {
+            const dynamicTerms = await fetchDynamicWikiTerms(currentCatKey);
+            const freshDynamic = dynamicTerms.filter(dt => !sessionUsed.has(dt) && !playerHist.has(dt));
+            if (freshDynamic.length > 0) {
+                const fallbackCluster = clusters[0];
+                freshDynamic.forEach(dt => candidates.push({ term: dt, cluster: fallbackCluster }));
+            } else {
+                // Fallback: alle Begriffe dieser Kategorie wieder zulassen
+                clusters.forEach(cl => {
+                    const terms = cl[diff] || cl.medium || [];
+                    terms.forEach(term => {
+                        if (!sessionUsed.has(term)) candidates.push({ term, cluster: cl });
+                    });
+                });
+            }
         }
-        if (pool.length === 0) {
-            const allCatItems = clusters.flatMap(c => [...(c.easy || []), ...(c.medium || []), ...(c.hard || [])]);
-            pool = allCatItems.filter(item => !sessionUsedTerms.has(item));
-        }
-        if (pool.length === 0) {
-            sessionUsedTerms.clear();
-            pool = currentCluster[difficulty] || currentCluster.medium;
+
+        if (candidates.length === 0) {
+            sessionUsed.clear();
+            clusters.forEach(cl => (cl.medium || []).forEach(term => candidates.push({ term, cluster: cl })));
         }
 
-        currentTargetDe = pool[Math.floor(Math.random() * pool.length)];
-        sessionUsedTerms.add(currentTargetDe);
-
-        const lang = document.getElementById("lang-select").value;
+        const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+        currentTargetDe = chosen.term;
+        currentCluster = chosen.cluster;
+        sessionUsed.add(currentTargetDe);
 
         try {
-            const articleData = await fetchWikiArticle(currentTargetDe, lang, difficulty);
-            if (!articleData || articleData.paragraphs.length === 0) {
-                if (retryCount < 5) return loadNextRound(retryCount + 1);
+            const article = await fetchWikiArticle(currentTargetDe, currentLang, diff);
+            if (!article || article.chunks.length === 0) {
+                if (retryCount < 4) return loadNextRound(retryCount + 1);
+                throw new Error('Empty article');
+            }
+            currentDisplayTitle = article.title;
+            textChunks = article.chunks;
+
+            // Sicherstellen, dass mindestens 3 sichtbare Wörter im ersten Abschnitt stehen
+            const visibleWords = countVisibleWords(redactText(textChunks[0], currentDisplayTitle));
+            if (visibleWords < 3) {
+                if (textChunks.length > 1) {
+                    textChunks[0] = textChunks[0] + ' ' + textChunks[1];
+                    textChunks.splice(1, 1);
+                } else if (retryCount < 4) {
+                    return loadNextRound(retryCount + 1);
+                }
             }
 
-            currentDisplayTitle = articleData.title;
-            paragraphs = articleData.paragraphs;
-
-            // Prüfen, ob mindestens 3 sichtbare Wörter im ersten Auszug vorhanden sind
-            const testRedacted = redactText(paragraphs[0], currentDisplayTitle);
-            const visibleWords = testRedacted.replace(/<[^>]+>/g, " ").replace(/█+/g, " ").trim().split(/\s+/).filter(w => w.length > 1);
-            if (visibleWords.length < 3 && paragraphs.length > 1) {
-                revealedCount = 2;
-            }
-
-            if (revealedCount >= paragraphs.length) {
-                hintBtn.classList.add("hidden");
+            if (textChunks.length < 2) {
+                document.getElementById('hint-btn').classList.add('hidden');
             }
 
             renderWikiText(false);
-            await setupAnswerArea(lang, difficulty);
+            await setupAnswerArea();
             roundActive = true;
             startTimer();
         } catch (err) {
-            if (retryCount < 4) return loadNextRound(retryCount + 1);
-            document.getElementById("wiki-text").innerHTML = "Verbindungsproblem mit Wikipedia. Bitte auf Weiter klicken.";
-            nextRoundBtn.classList.remove("hidden");
+            document.getElementById('wiki-text').textContent = t('loadError');
+            document.getElementById('hint-btn').classList.add('hidden');
+            document.getElementById('next-round-btn').classList.remove('hidden');
         }
     }
 
-    async function fetchWikiArticle(germanTitle, targetLang, difficulty) {
+    async function fetchWikiArticle(germanTitle, targetLang, diff) {
         let titleToFetch = germanTitle;
-
-        if (targetLang !== "de") {
-            const langLinkUrl = `https://de.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(germanTitle)}&redirects=1&prop=langlinks&lllang=${targetLang}&format=json&origin=*`;
-            const res = await fetch(langLinkUrl);
+        if (targetLang !== 'de') {
+            const llUrl = `https://de.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(germanTitle)}&prop=langlinks&lllang=${targetLang}&redirects=1&format=json&origin=*`;
+            const res = await fetch(llUrl);
             const data = await res.json();
             const pages = data.query.pages;
-            const pageId = Object.keys(pages)[0];
-            if (pages[pageId] && pages[pageId].langlinks && pages[pageId].langlinks.length > 0) {
-                titleToFetch = pages[pageId].langlinks[0]["*"];
+            const pid = Object.keys(pages)[0];
+            if (pages[pid].langlinks && pages[pid].langlinks.length > 0) {
+                titleToFetch = pages[pid].langlinks[0]['*'];
             }
         }
 
         const apiUrl = `https://${targetLang}.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext=1&exintro=0&redirects=1&titles=${encodeURIComponent(titleToFetch)}&format=json&origin=*`;
-        const response = await fetch(apiUrl);
-        const json = await response.json();
+        const resp = await fetch(apiUrl);
+        const json = await resp.json();
         const pages = json.query.pages;
         const page = pages[Object.keys(pages)[0]];
-
         if (!page || !page.extract) return null;
 
-        let rawParagraphs = page.extract
-            .split("\n")
+        let paras = page.extract
+            .split('\n')
             .map(p => p.trim())
-            .filter(p => p.length > 45 && !p.startsWith("=="));
+            .filter(p => p.length > 45 && !p.startsWith('=='));
 
-        if (rawParagraphs.length === 0) return null;
-
-        // Im Experten-Modus ersten Absatz überspringen, falls genug Text vorhanden ist
-        if (difficulty === "hard" && rawParagraphs.length > 2) {
-            rawParagraphs = rawParagraphs.slice(1);
+        if (diff === 'expert' && paras.length > 2) {
+            paras = paras.slice(1);
         }
 
-        // Ersten Absatz für Stufe 1 (erster Satz) und Stufe 2 (Rest des Absatzes) teilen
-        const firstPara = rawParagraphs[0];
-        const sentenceMatch = firstPara.match(/^(.+?[.!?])(?:\s+|$)/);
-        let stage1 = firstPara;
-        let stage2 = rawParagraphs[1] || "";
-        let stage3 = rawParagraphs[2] || "";
-
-        if (sentenceMatch && sentenceMatch[1].length >= 35 && sentenceMatch[1].length < firstPara.length - 25) {
-            stage1 = sentenceMatch[1];
-            const restOfFirst = firstPara.slice(stage1.length).trim();
-            stage2 = restOfFirst;
-            stage3 = rawParagraphs[1] || "";
+        const chunks = [];
+        if (paras.length > 0) {
+            const firstPara = paras[0];
+            const dotIdx = firstPara.indexOf('. ');
+            if (dotIdx > 30 && dotIdx < firstPara.length - 30) {
+                chunks.push(firstPara.slice(0, dotIdx + 1));
+                chunks.push(firstPara.slice(dotIdx + 2));
+                if (paras[1]) chunks.push(paras[1]);
+            } else {
+                chunks.push(firstPara);
+                if (paras[1]) chunks.push(paras[1]);
+                if (paras[2]) chunks.push(paras[2]);
+            }
         }
 
-        const finalParagraphs = [stage1, stage2, stage3].filter(p => p && p.trim().length > 15);
+        return { title: page.title, chunks: chunks.slice(0, 3) };
+    }
 
-        return {
-            title: page.title,
-            paragraphs: finalParagraphs
-        };
+    function escapeRegExp(str) {
+        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function makeRedactedSpan(len) {
+        const clamped = Math.min(Math.max(len, 4), 22);
+        return `<span class="redacted">${'█'.repeat(clamped)}</span>`;
     }
 
     function redactText(text, title) {
         let result = text;
+        // Alle runden und eckigen Klammern komplett schwärzen
+        result = result.replace(/\([^()]*\)/g, m => makeRedactedSpan(m.length));
+        result = result.replace(/\([^()]*\)/g, m => makeRedactedSpan(m.length));
+        result = result.replace(/\[[^\[\]]*\]/g, m => makeRedactedSpan(m.length));
 
-        // Alle runden und eckigen Klammern (inkl. verschachtelter Klammern, Lautschrift & Aliase) schwärzen
-        let prev;
-        do {
-            prev = result;
-            result = result.replace(/\([^()]*\)/g, match => `<span class="redacted">${"█".repeat(match.length)}</span>`);
-            result = result.replace(/\[[^\[\]]*\]/g, match => `<span class="redacted">${"█".repeat(match.length)}</span>`);
-        } while (result !== prev);
-
-        // Gesuchten Titel und Namensbestandteile schwärzen
-        const cleanTitle = title.replace(/\s*\(.*?\)\s*/g, "").trim();
-        const stopWords = ["der", "die", "das", "von", "und", "den", "dem", "des", "ein", "eine", "the", "and", "of", "les", "des", "del", "della"];
-        const words = cleanTitle.split(/[\s\-–—]+/).filter(w => w.length > 2 && !stopWords.includes(w.toLowerCase()));
-
+        const cleanTitle = title.replace(/\s*\(.*?\)\s*/g, '').trim();
         if (cleanTitle.length > 1) {
-            const fullRegex = new RegExp(escapeRegExp(cleanTitle), "gi");
-            result = result.replace(fullRegex, match => `<span class="redacted">${"█".repeat(match.length)}</span>`);
+            const fullRe = new RegExp(escapeRegExp(cleanTitle), 'gi');
+            result = result.replace(fullRe, m => makeRedactedSpan(m.length));
         }
 
-        words.forEach(word => {
-            const stem = word.length > 5 ? word.slice(0, -1) : word;
-            const wordRegex = new RegExp(`(?<![a-zA-ZäöüÄÖÜß])${escapeRegExp(stem)}[a-zA-ZäöüÄÖÜß]*`, "gi");
-            result = result.replace(wordRegex, match => `<span class="redacted">${"█".repeat(match.length)}</span>`);
+        const stopWords = ['der', 'die', 'das', 'von', 'und', 'the', 'les', 'des', 'los', 'las', 'del', 'della'];
+        const words = cleanTitle.split(/[\s\-]+/).filter(w => w.length > 2 && !stopWords.includes(w.toLowerCase()));
+        words.forEach(w => {
+            const wordRe = new RegExp('\\b' + escapeRegExp(w) + '[a-zäöüßéèêàáâíìîóòôúùûñç]*', 'gi');
+            result = result.replace(wordRe, m => makeRedactedSpan(m.length));
         });
 
         return result;
     }
 
-    function escapeRegExp(string) {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    function countVisibleWords(htmlStr) {
+        const plain = htmlStr.replace(/<[^>]*>/g, ' ').replace(/█+/g, ' ');
+        return plain.split(/\s+/).filter(w => w.length > 1).length;
     }
 
     function renderWikiText(revealAll) {
-        const container = document.getElementById("wiki-text");
-        const visibleParas = paragraphs.slice(0, revealedCount);
-        container.innerHTML = visibleParas.map(p => {
-            const content = revealAll ? escapeHtml(p) : redactText(escapeHtml(p), currentDisplayTitle);
+        const box = document.getElementById('wiki-text');
+        const visible = textChunks.slice(0, revealedCount);
+        box.innerHTML = visible.map(c => {
+            const content = revealAll ? c : redactText(c, currentDisplayTitle);
             return `<div class="wiki-paragraph">${content}</div>`;
-        }).join("");
+        }).join('');
     }
 
-    hintBtn.addEventListener("click", function() {
-        if (!roundActive || revealedCount >= paragraphs.length) return;
-        playSound("hint");
-        revealedCount++;
-        possiblePoints = Math.max(1, 4 - revealedCount);
-        updatePointsBadge();
-        renderWikiText(false);
+    async function setupAnswerArea() {
+        const mode = document.getElementById('input-mode').value;
+        if (mode === 'mc') {
+            const mcArea = document.getElementById('mc-area');
+            mcArea.classList.remove('hidden');
+            mcArea.innerHTML = '';
 
-        if (revealedCount >= paragraphs.length) {
-            hintBtn.disabled = true;
-        }
-    });
+            const diff = document.getElementById('difficulty-select').value;
+            let pool = [...(currentCluster[diff] || []), ...(currentCluster.medium || []), ...(currentCluster.easy || [])];
+            pool = [...new Set(pool)].filter(item => item !== currentTargetDe);
+            pool.sort(() => 0.5 - Math.random());
+            const distractorsDe = pool.slice(0, 3);
 
-    function updatePointsBadge() {
-        document.getElementById("points-badge").textContent = `${possiblePoints} Pkt.`;
-    }
-
-    async function setupAnswerArea(lang, difficulty) {
-        const mode = document.getElementById("input-mode").value;
-        if (mode === "mc") {
-            const mcArea = document.getElementById("mc-area");
-            mcArea.classList.remove("hidden");
-            mcArea.innerHTML = "Lade Auswahlmöglichkeiten...";
-
-            // Ablenkungsbegriffe aus demselben Themen-Cluster & Schwierigkeitsgrad wählen
-            let candidates = (currentCluster[difficulty] || []).filter(item => item !== currentTargetDe);
-            if (candidates.length < 3) {
-                const allCluster = [...(currentCluster.easy || []), ...(currentCluster.medium || []), ...(currentCluster.hard || [])];
-                candidates = allCluster.filter(item => item !== currentTargetDe);
-            }
-
-            const distractorsDe = candidates.sort(() => 0.5 - Math.random()).slice(0, 3);
-            let options = [currentDisplayTitle];
-
+            const options = [currentDisplayTitle];
             for (const d of distractorsDe) {
-                if (lang === "de") {
+                if (currentLang === 'de') {
                     options.push(d);
                 } else {
                     try {
-                        const url = `https://de.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(d)}&redirects=1&prop=langlinks&lllang=${lang}&format=json&origin=*`;
+                        const url = `https://de.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(d)}&prop=langlinks&lllang=${currentLang}&redirects=1&format=json&origin=*`;
                         const r = await fetch(url);
                         const j = await r.json();
                         const p = j.query.pages[Object.keys(j.query.pages)[0]];
-                        options.push(p && p.langlinks ? p.langlinks[0]["*"] : d);
+                        options.push(p.langlinks ? p.langlinks[0]['*'] : d);
                     } catch (e) {
                         options.push(d);
                     }
                 }
             }
 
-            options = options.sort(() => 0.5 - Math.random());
-            mcArea.innerHTML = "";
+            options.sort(() => 0.5 - Math.random());
             options.forEach(opt => {
-                const btn = document.createElement("button");
-                btn.type = "button";
-                btn.className = "mc-btn";
-                btn.textContent = opt.replace(/\s*\(.*?\)\s*/g, "");
-                btn.addEventListener("click", function() {
-                    checkMultipleChoice(btn, opt);
-                });
+                const cleanOpt = opt.replace(/\s*\(.*?\)\s*/g, '');
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'mc-btn';
+                btn.textContent = cleanOpt;
+                btn.onclick = () => {
+                    if (!roundActive) return;
+                    document.querySelectorAll('.mc-btn').forEach(b => b.disabled = true);
+                    const isWin = opt === currentDisplayTitle;
+                    btn.classList.add(isWin ? 'correct' : 'wrong');
+                    endRound(isWin, false);
+                };
                 mcArea.appendChild(btn);
             });
         } else {
-            const textArea = document.getElementById("text-area");
-            textArea.classList.remove("hidden");
-            guessInput.value = "";
-            guessInput.disabled = false;
-            guessInput.focus();
-        }
-    }
-
-    function checkMultipleChoice(btnElement, selectedOption) {
-        if (!roundActive) return;
-        const isCorrect = selectedOption === currentDisplayTitle;
-
-        document.querySelectorAll(".mc-btn").forEach(b => b.disabled = true);
-        if (isCorrect) {
-            btnElement.classList.add("correct");
-            endRound(true);
-        } else {
-            btnElement.classList.add("wrong");
-            endRound(false);
+            const textArea = document.getElementById('text-area');
+            const input = document.getElementById('guess-input');
+            textArea.classList.remove('hidden');
+            input.value = '';
+            input.disabled = false;
+            input.focus();
         }
     }
 
     function submitTextGuess() {
         if (!roundActive) return;
-        const guess = guessInput.value.trim().toLowerCase();
+        const input = document.getElementById('guess-input');
+        const guess = input.value.trim().toLowerCase();
         if (!guess) return;
 
-        const cleanTarget = currentDisplayTitle.replace(/\s*\(.*?\)\s*/g, "").trim().toLowerCase();
-        const targetParts = cleanTarget.split(" ");
-        const lastName = targetParts[targetParts.length - 1];
+        const cleanTarget = currentDisplayTitle.replace(/\s*\(.*?\)\s*/g, '').trim().toLowerCase();
+        const parts = cleanTarget.split(' ');
+        const lastWord = parts[parts.length - 1];
+        const isWin = guess === cleanTarget || (lastWord.length >= 4 && guess === lastWord);
 
-        const isCorrect = guess === cleanTarget || (lastName.length >= 4 && guess === lastName);
-        guessInput.disabled = true;
-        endRound(isCorrect);
+        input.disabled = true;
+        endRound(isWin, false);
     }
 
-    submitGuessBtn.addEventListener("click", submitTextGuess);
-    guessInput.addEventListener("keydown", function(e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            submitTextGuess();
-        }
-    });
-
     function startTimer() {
-        const limit = parseInt(document.getElementById("timer-select").value, 10);
-        const timerBadge = document.getElementById("timer-badge");
-
+        const limit = parseInt(document.getElementById('timer-select').value);
+        const badge = document.getElementById('timer-badge');
         if (limit === 0) {
-            timerBadge.classList.add("hidden");
+            badge.classList.add('hidden');
             return;
         }
-
-        timerBadge.classList.remove("hidden", "urgent");
+        badge.classList.remove('hidden', 'urgent');
         timeLeft = limit;
-        timerBadge.textContent = `⏱ ${timeLeft}s`;
+        badge.textContent = `⏱ ${timeLeft}s`;
 
         timerInterval = setInterval(() => {
             timeLeft--;
-            timerBadge.textContent = `⏱ ${timeLeft}s`;
-            if (timeLeft <= 10) timerBadge.classList.add("urgent");
-            if (timeLeft <= 5 && timeLeft > 0) playSound("tick");
-
+            badge.textContent = `⏱ ${timeLeft}s`;
+            if (timeLeft <= 5 && timeLeft > 0) {
+                badge.classList.add('urgent');
+                playSound('tick');
+            }
             if (timeLeft <= 0) {
                 clearInterval(timerInterval);
                 endRound(false, true);
@@ -934,94 +744,126 @@ document.addEventListener("DOMContentLoaded", function() {
         }, 1000);
     }
 
-    function endRound(won, timeOut = false) {
+    function endRound(won, timeOut) {
         roundActive = false;
         clearInterval(timerInterval);
         renderWikiText(true);
 
-        const feedback = document.getElementById("feedback-box");
-        feedback.classList.remove("hidden", "win", "lose");
+        const player = getCurrentPlayer();
+        savePlayerHistory(player.name, currentTargetDe);
+        renderPlayerTags();
 
-        const cleanTitle = currentDisplayTitle.replace(/\s*\(.*?\)\s*/g, "");
-        const currentIdx = getCurrentPlayerIndex();
+        const fb = document.getElementById('feedback-box');
+        fb.classList.remove('hidden', 'win', 'lose', 'tie');
+        const cleanTitle = currentDisplayTitle.replace(/\s*\(.*?\)\s*/g, '');
 
         if (won) {
-            playSound("win");
-            players[currentIdx].score += possiblePoints;
-            feedback.classList.add("win");
-            feedback.textContent = `🎉 Richtig! Gesucht war „${cleanTitle}“. +${possiblePoints} Punkt(e) für ${players[currentIdx].name}!`;
+            player.score += possiblePoints;
+            fb.classList.add('win');
+            fb.textContent = `${t('winMsg')} „${cleanTitle}“. +${possiblePoints} ${t('ptsFor')} ${player.name}!`;
+            playSound('win');
         } else {
-            playSound("lose");
-            feedback.classList.add("lose");
-            feedback.textContent = timeOut
-                ? `⏱ Zeit abgelaufen! Gesucht war „${cleanTitle}“. 0 Punkte.`
-                : `❌ Leider falsch! Gesucht war „${cleanTitle}“. 0 Punkte.`;
+            fb.classList.add('lose');
+            const prefix = timeOut ? t('timeOutMsg') : t('loseMsg');
+            fb.textContent = `${prefix} „${cleanTitle}“. ${t('zeroPts')}`;
+            playSound('lose');
         }
 
-        updateScoreboard();
-        hintBtn.classList.add("hidden");
-        nextRoundBtn.classList.remove("hidden");
+        updateStatusUI();
+        document.getElementById('hint-btn').classList.add('hidden');
+        document.getElementById('next-round-btn').classList.remove('hidden');
     }
 
-    nextRoundBtn.addEventListener("click", function() {
+    function nextTurn() {
         turnPointer++;
-
-        // Prüfen, ob alle aktiven Spieler dieser Runde dran waren
         if (turnPointer >= activePlayerIndices.length) {
             turnPointer = 0;
-
-            if (!isTiebreaker) {
-                currentRoundNumber++;
-                if (currentRoundNumber > totalRoundsPerPlayer) {
-                    evaluateEndOfGame();
+            if (!isTieBreaker) {
+                currentRound++;
+                if (currentRound > totalRounds) {
+                    checkEndOrTieBreaker();
                     return;
                 }
             } else {
-                // Nach einer kompletten Stechen-Runde prüfen, ob jetzt ein alleiniger Sieger feststeht
-                evaluateEndOfGame();
+                checkEndOrTieBreaker();
                 return;
             }
         }
-
         loadNextRound();
-    });
+    }
 
-    function evaluateEndOfGame() {
+    function checkEndOrTieBreaker() {
         const maxScore = Math.max(...players.map(p => p.score));
-        const topPlayers = players
-            .map((p, idx) => ({ ...p, idx }))
-            .filter(p => p.score === maxScore);
+        const leaders = players.map((p, i) => ({ p, i })).filter(x => x.p.score === maxScore);
 
-        // Stechen auslösen, falls mehr als 1 Spieler im Multiplayer punktgleich vorne liegt
-        if (players.length > 1 && topPlayers.length > 1) {
-            isTiebreaker = true;
-            activePlayerIndices = topPlayers.map(p => p.idx);
+        if (players.length > 1 && leaders.length > 1) {
+            isTieBreaker = true;
+            activePlayerIndices = leaders.map(x => x.i);
             turnPointer = 0;
-            document.getElementById("tiebreaker-banner").classList.remove("hidden");
             loadNextRound();
-            return;
+        } else {
+            showEndScreen();
         }
+    }
 
-        // Siegerehrung anzeigen
-        playSound("fanfare");
-        document.getElementById("game-screen").classList.add("hidden");
-        document.getElementById("end-screen").classList.remove("hidden");
+    function showEndScreen() {
+        playSound('fanfare');
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.remove('hidden');
 
         const sorted = [...players].sort((a, b) => b.score - a.score);
-        document.getElementById("winner-announcement").textContent = players.length > 1
-            ? `Herzlichen Glückwunsch, ${sorted[0].name}!`
-            : `Dein Endergebnis: ${sorted[0].score} Punkte!`;
-
-        const medals = ["🥇", "🥈", "🥉"];
-        document.getElementById("podium-list").innerHTML = sorted.map((p, i) => `
-            <div class="podium-item ${i === 0 ? 'first' : ''}">
-                <span>${medals[i] || (i + 1) + "."} ${escapeHtml(p.name)}</span>
-                <span>${p.score} Punkte</span>
-            </div>
-        `).join("");
+        const list = document.getElementById('podium-list');
+        list.innerHTML = sorted.map((p, idx) => {
+            const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}.`;
+            return `<div class="podium-item ${idx === 0 ? 'first' : ''}">
+                <span>${medal} ${p.name}</span>
+                <span>${p.score} ${t('ptsShort')}</span>
+            </div>`;
+        }).join('');
     }
-});
-</script>
 
+    // Event-Bindings
+    document.getElementById('lang-select').addEventListener('change', applyTranslations);
+    document.getElementById('sound-btn').addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        document.getElementById('sound-btn').textContent = soundEnabled ? t('soundOn') : t('soundOff');
+    });
+    document.getElementById('add-player-btn').addEventListener('click', addPlayer);
+    document.getElementById('player-name-input').addEventListener('keypress', e => {
+        if (e.key === 'Enter') addPlayer();
+    });
+    document.getElementById('start-game-btn').addEventListener('click', startGame);
+    document.getElementById('hint-btn').addEventListener('click', () => {
+        if (!roundActive || revealedCount >= textChunks.length) return;
+        playSound('hint');
+        revealedCount++;
+        possiblePoints = Math.max(1, 4 - revealedCount);
+        updateStatusUI();
+        renderWikiText(false);
+        if (revealedCount >= textChunks.length) {
+            document.getElementById('hint-btn').disabled = true;
+        }
+    });
+    document.getElementById('submit-text-btn').addEventListener('click', submitTextGuess);
+    document.getElementById('guess-input').addEventListener('keypress', e => {
+        if (e.key === 'Enter') submitTextGuess();
+    });
+    document.getElementById('next-round-btn').addEventListener('click', nextTurn);
+    document.getElementById('menu-btn').addEventListener('click', () => {
+        clearInterval(timerInterval);
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.add('hidden');
+        document.getElementById('setup-screen').classList.remove('hidden');
+        renderPlayerTags();
+    });
+    document.getElementById('play-again-btn').addEventListener('click', () => {
+        document.getElementById('end-screen').classList.add('hidden');
+        document.getElementById('setup-screen').classList.remove('hidden');
+        renderPlayerTags();
+    });
+
+    applyTranslations();
+})();
+</script>
 </body>
 </html>
