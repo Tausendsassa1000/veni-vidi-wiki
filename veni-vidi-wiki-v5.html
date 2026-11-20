@@ -15,11 +15,16 @@
 --success: #16a34a;
 --danger: #dc2626;
 }
-* { box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-body { background-color: var(--bg); color: var(--text); margin: 0; padding: 12px; display: flex; justify-content: center; }
-.container { max-width: 760px; width: 100%; background: var(--card); border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); padding: 22px; }
-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 14px; margin-bottom: 18px; gap: 10px; flex-wrap: wrap; }
-h1 { margin: 0; font-size: 1.85rem; letter-spacing: -0.5px; color: #0f172a; }
+body:has(> #gameRoot) { margin: 0; padding: 0; background: #090d16; }
+#gameRoot, #gameRoot * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+#gameRoot { max-width: 860px; width: 100%; min-height: 66dvh; margin: 10px auto; background: var(--card); color: var(--text); border: 1.5px solid #cbd5e1; border-radius: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; }
+@media (max-width: 600px) { #gameRoot { min-height: auto; margin: 6px auto; padding: 10px; border-radius: 14px; } }
+.ka2-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; margin-bottom: 12px; border-bottom: 1.5px solid #e2e8f0; gap: 8px; }
+.ka2-brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 0.92rem; color: var(--muted); }
+.ka2-bar-actions { display: flex; align-items: center; gap: 8px; }
+header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+h1 { margin: 0; font-size: 1.75rem; letter-spacing: -0.5px; color: #0f172a; }
+=== ENDE ===
 h1 span { color: var(--primary); }
 .subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
 .sound-btn { background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 6px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--text); white-space: nowrap; }
@@ -27,6 +32,13 @@ h1 span { color: var(--primary); }
 @media (max-width: 600px) { .setup-grid { grid-template-columns: 1fr; } }
 label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.88rem; }
 select, input[type="text"], input[type="number"] { width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; background: #fff; color: var(--text); }
+.ka2-sel {
+  -webkit-appearance: none; appearance: none; padding-right: 30px;
+  background-image: linear-gradient(45deg, transparent 50%, #2563eb 50%), linear-gradient(135deg, #2563eb 50%, transparent 50%);
+  background-position: calc(100% - 15px) 52%, calc(100% - 10px) 52%;
+  background-size: 5px 5px, 5px 5px; background-repeat: no-repeat;
+}
+=== ENDE ===
 .player-setup { background: #f1f5f9; padding: 14px; border-radius: 10px; margin-bottom: 18px; }
 .player-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .player-tag { background: var(--primary); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.88rem; display: flex; align-items: center; gap: 8px; }
@@ -73,22 +85,54 @@ select, input[type="text"], input[type="number"] { width: 100%; padding: 9px 12p
 .podium { text-align: center; padding: 15px 0; }
 .podium-item { background: #f8fafc; border: 1.5px solid #e2e8f0; padding: 12px; border-radius: 10px; margin-bottom: 8px; font-size: 1.05rem; display: flex; justify-content: space-between; align-items: center; }
 .podium-item.first { background: #fef9c3; border-color: #eab308; font-weight: bold; font-size: 1.15rem; }
+#gameRoot.fullscreen-play { position: fixed; top: 0; left: 0; right: 0; bottom: 0; max-width: 100%; width: 100%; height: 100dvh; min-height: 100dvh; margin: 0; border-radius: 0; border: none; z-index: 2147483647; overscroll-behavior: none; touch-action: manipulation; justify-content: flex-start; overflow: hidden; padding: 12px 16px; }
+#gameRoot.fullscreen-play #game-screen { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+#gameRoot.fullscreen-play .wiki-box { flex: 1; min-height: 80px; overflow-y: auto; -webkit-overflow-scrolling: touch; margin-bottom: 10px; padding: 12px 14px; font-size: 0.96rem; }
+#gameRoot.fullscreen-play header { margin-bottom: 8px; padding-bottom: 8px; }
+#gameRoot.fullscreen-play .subtitle { display: none; }
+#gameRoot.fullscreen-play .scoreboard { margin-top: 8px; padding-top: 8px; }
+.ka2-resume-btn { background: #eff6ff; border: 1.5px solid #2563eb; color: #1d4ed8; margin-bottom: 12px; }
+.ka2-rotate-hint { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #0f172a; color: #f8fafc; z-index: 2147483647; align-items: center; justify-content: center; text-align: center; padding: 24px; font-size: 1.1rem; font-weight: 600; }
+@media (orientation: landscape) and (max-height: 460px) and (pointer: coarse) { #gameRoot.fullscreen-play .ka2-rotate-hint { display: flex; } }
 </style>
+=== ENDE ===
 </head>
 <body>
-<div class="container">
+<div id="gameRoot">
+<div class="ka2-rotate-hint" id="rotate-hint">Bitte Smartphone hochkant drehen ↺</div>
+<div class="ka2-bar">
+<div class="ka2-brand">
+<svg width="44" height="19" viewBox="0 0 220 95" aria-label="KA2 Logo" style="display:block; flex-shrink:0; border-radius:50%; overflow:hidden; background:#4f4f4f;">
+<rect x="42" y="0" width="52" height="95" fill="#0068b7"/>
+<polygon points="42,50 86,95 42,95" fill="#00b4ed"/>
+<polygon points="88,28 122,74 88,74" fill="#39a935"/>
+<rect x="88" y="74" width="54" height="21" fill="#ffed00"/>
+<polygon points="62,0 185,0 185,74 118,74" fill="#e30613"/>
+<polygon points="164,0 185,0 185,74 176,74" fill="#ea5b0c"/>
+<polygon points="142,74 185,74 172,95 142,95" fill="#e6007e"/>
+<path d="M36,0 H47 V45 L88,0 H103 L61,46 L104,95 H89 L47,48 V95 H36 Z" fill="#2d2d2d"/>
+<path d="M111,0 H123 L156,95 H144 L136,72 H98 L90,95 H78 Z M102,62 H132 L117,17 Z" fill="#2d2d2d"/>
+<path d="M138,26 C138,10 150,2 164,2 C178,2 187,11 187,25 C187,39 177,48 161,61 L148,72 H187 V83 H134 V73 L153,56 C168,43 175,36 175,25 C175,17 170,12 163,12 C155,12 150,18 150,27 Z" fill="#2d2d2d"/>
+</svg>
+<span>ka-2.art Games</span>
+</div>
+<div class="ka2-bar-actions">
+<button type="button" class="sound-btn" id="sound-toggle-btn"></button>
+<button type="button" class="sound-btn hidden" id="exitFsBtn">✕ Menü</button>
+</div>
+</div>
 <header>
 <div>
 <h1>Veni, vidi, <span>wiki</span></h1>
 <div class="subtitle" id="ui-subtitle"></div>
 </div>
-<button type="button" class="sound-btn" id="sound-toggle-btn"></button>
 </header>
 <div id="setup-screen">
+<button type="button" class="btn ka2-resume-btn hidden" id="resumeBtn">▶ Laufendes Spiel fortsetzen</button>
 <div class="setup-grid">
 <div>
 <label for="lang-select" id="ui-lbl-lang"></label>
-<select id="lang-select">
+<select id="lang-select" class="ka2-sel">
 <option value="de" selected>Deutsch</option>
 <option value="en">English</option>
 <option value="fr">Français</option>
@@ -98,20 +142,21 @@ select, input[type="text"], input[type="number"] { width: 100%; padding: 9px 12p
 </div>
 <div>
 <label for="category-select" id="ui-lbl-cat"></label>
-<select id="category-select"></select>
+<select id="category-select" class="ka2-sel"></select>
 </div>
 <div>
 <label for="diff-select" id="ui-lbl-diff"></label>
-<select id="diff-select"></select>
+<select id="diff-select" class="ka2-sel"></select>
 </div>
 <div>
 <label for="input-mode" id="ui-lbl-mode"></label>
-<select id="input-mode"></select>
+<select id="input-mode" class="ka2-sel"></select>
 </div>
 <div>
 <label for="timer-select" id="ui-lbl-timer"></label>
-<select id="timer-select"></select>
+<select id="timer-select" class="ka2-sel"></select>
 </div>
+=== ENDE ===
 <div>
 <label for="rounds-input" id="ui-lbl-rounds"></label>
 <input type="number" id="rounds-input" value="10" min="1" max="100">
@@ -169,25 +214,26 @@ select, input[type="text"], input[type="number"] { width: 100%; padding: 9px 12p
 const I18N = {
 de: {
 subtitle: "Errate den Wikipedia-Eintrag – je weniger Hinweise, desto mehr Punkte!",
-soundOn: " 🔊 Ton an", soundOff: " 🔇 Ton aus",
+soundOn: "♪ Ton an", soundOff: "✕ Ton aus",
 lblLang: "Sprache (Menü & Artikel)", lblCat: "Kategorie", lblDiff: "Schwierigkeitsgrad",
 lblMode: "Rate-Modus", lblTimer: "Timer pro Runde", lblRounds: "Runden pro Spieler",
 lblPlayers: "Spielende (Solo = 1, Multiplayer = mehrere Namen)",
 playerPlaceholder: "Name eingeben...", btnAdd: "+ Hinzufügen", btnStart: "Spiel starten",
-cats: { all: " 🎲 Quer-durch (Alle)", people: " 👤 Persönlichkeiten", places: " 🌍 Orte & Bauwerke", nature: " 🦁 Tiere & Natur", culture: " 🎬 Kultur & Musik", science: " 🔬 Wissenschaft & Technik", sport: " ⚽ Sport", food: " 🍕 Essen & Trinken" },
+cats: { all: "★ Quer-durch (Alle)", people: "● Persönlichkeiten", places: "● Orte & Bauwerke", nature: "● Tiere & Natur", culture: "● Kultur & Musik", science: "● Wissenschaft & Technik", sport: "● Sport", food: "● Essen & Trinken" },
 diffs: { easy: "Leicht", medium: "Mittel", hard: "Experte" },
 modes: { mc: "Multiple Choice (4 Auswahlmöglichkeiten)", text: "Freies Textfeld" },
 timers: { "30": "30 Sekunden", "45": "45 Sekunden", "60": "60 Sekunden", "0": "Kein Timer" },
 turn: "Am Zug", round: "Runde", points: "Punkte", loading: "Suche Wikipedia-Eintrag...",
 guessPlaceholder: "Gesuchten Begriff eintippen...", btnCheck: "Prüfen",
-btnHint: " 🔍 Weiteren Text (-1 Pkt.)", btnNext: "Weiter ➔", btnMenu: "Menü",
+btnHint: "+ Weiterer Text (-1 Pkt.)", btnNext: "Weiter ▶", btnMenu: "Menü",
 scoreboard: "Punktestand", ptsShort: "Pkt.", playedShort: "gespielt",
-winMsg: " 🎉 Richtig! Gesucht war „{title}“. +{pts} Punkt(e)!",
-loseMsg: " ❌ Falsch! Gesucht war „{title}“. 0 Punkte.",
-timeoutMsg: " ⏱ Zeit abgelaufen! Gesucht war „{title}“. 0 Punkte.",
-tieBanner: " ⚡ STECHEN! Gleichstand an der Spitze – Entscheidungsrunde!",
-endTitle: " 🏆 Spielende & Siegerehrung", btnAgain: "Neues Spiel", defaultPlayer: "Spieler 1"
+winMsg: "✓ Richtig! Gesucht war „{title}“. +{pts} Punkt(e)!",
+loseMsg: "✕ Falsch! Gesucht war „{title}“. 0 Punkte.",
+timeoutMsg: "↺ Zeit abgelaufen! Gesucht war „{title}“. 0 Punkte.",
+tieBanner: "★ STECHEN! Gleichstand an der Spitze – Entscheidungsrunde!",
+endTitle: "★ Spielende & Siegerehrung", btnAgain: "Neues Spiel", defaultPlayer: "Spieler 1"
 },
+=== ENDE ===
 en: {
 subtitle: "Guess the Wikipedia entry – fewer hints mean more points!",
 soundOn: " 🔊 Sound on", soundOff: " 🔇 Sound off",
@@ -211,67 +257,68 @@ endTitle: " 🏆 Game Over & Podium", btnAgain: "Play Again", defaultPlayer: "Pl
 },
 fr: {
 subtitle: "Devinez l'article Wikipédia – moins d'indices, plus de points !",
-soundOn: " 🔊 Son activé", soundOff: " 🔇 Son coupé",
+soundOn: "♪ Son activé", soundOff: "✕ Son coupé",
 lblLang: "Langue (Menu et Articles)", lblCat: "Catégorie", lblDiff: "Difficulté",
 lblMode: "Mode de réponse", lblTimer: "Minuteur par tour", lblRounds: "Tours par joueur",
 lblPlayers: "Joueurs (Solo = 1, Multijoueur = ajouter des noms)",
 playerPlaceholder: "Entrez un nom...", btnAdd: "+ Ajouter", btnStart: "Commencer",
-cats: { all: " 🎲 Mélange (Toutes)", people: " 👤 Personnalités", places: " 🌍 Lieux et Monuments", nature: " 🦁 Animaux et Nature", culture: " 🎬 Culture et Musique", science: " 🔬 Science et Tech", sport: " ⚽ Sport", food: " 🍕 Gastronomie" },
+cats: { all: "★ Mélange (Toutes)", people: "● Personnalités", places: "● Lieux et Monuments", nature: "● Animaux et Nature", culture: "● Culture et Musique", science: "● Science et Tech", sport: "● Sport", food: "● Gastronomie" },
 diffs: { easy: "Facile", medium: "Moyen", hard: "Expert" },
 modes: { mc: "Choix multiple (4 options)", text: "Texte libre" },
 timers: { "30": "30 secondes", "45": "45 secondes", "60": "60 secondes", "0": "Sans minuteur" },
 turn: "Tour de", round: "Manche", points: "Points", loading: "Recherche sur Wikipédia...",
 guessPlaceholder: "Tapez la réponse...", btnCheck: "Vérifier",
-btnHint: " 🔍 Plus de texte (-1 pt)", btnNext: "Suivant ➔", btnMenu: "Menu",
+btnHint: "+ Plus de texte (-1 pt)", btnNext: "Suivant ▶", btnMenu: "Menu",
 scoreboard: "Scores", ptsShort: "pts", playedShort: "joués",
-winMsg: " 🎉 Bravo ! C'était « {title} ». +{pts} point(s) !",
-loseMsg: " ❌ Faux ! C'était « {title} ». 0 point.",
-timeoutMsg: " ⏱ Temps écoulé ! C'était « {title} ». 0 point.",
-tieBanner: " ⚡ ÉGALITÉ ! Manche décisive pour départager les premiers !",
-endTitle: " 🏆 Fin de partie et Podium", btnAgain: "Rejouer", defaultPlayer: "Joueur 1"
+winMsg: "✓ Bravo ! C'était « {title} ». +{pts} point(s) !",
+loseMsg: "✕ Faux ! C'était « {title} ». 0 point.",
+timeoutMsg: "↺ Temps écoulé ! C'était « {title} ». 0 point.",
+tieBanner: "★ ÉGALITÉ ! Manche décisive pour départager les premiers !",
+endTitle: "★ Fin de partie et Podium", btnAgain: "Rejouer", defaultPlayer: "Joueur 1"
 },
 it: {
 subtitle: "Indovina la voce di Wikipedia – meno indizi, più punti!",
-soundOn: " 🔊 Audio on", soundOff: " 🔇 Audio off",
+soundOn: "♪ Audio on", soundOff: "✕ Audio off",
 lblLang: "Lingua (Menu e Articoli)", lblCat: "Categoria", lblDiff: "Difficoltà",
 lblMode: "Modalità di risposta", lblTimer: "Timer per turno", lblRounds: "Turni per giocatore",
 lblPlayers: "Giocatori (Solo = 1, Multigiocatore = aggiungi nomi)",
 playerPlaceholder: "Inserisci nome...", btnAdd: "+ Aggiungi", btnStart: "Inizia partita",
-cats: { all: " 🎲 Misto (Tutte)", people: " 👤 Personaggi", places: " 🌍 Luoghi e Monumenti", nature: " 🦁 Animali e Natura", culture: " 🎬 Cultura e Musica", science: " 🔬 Scienza e Tecnologia", sport: " ⚽ Sport", food: " 🍕 Cibo e Bevande" },
+cats: { all: "★ Misto (Tutte)", people: "● Personaggi", places: "● Luoghi e Monumenti", nature: "● Animali e Natura", culture: "● Cultura e Musica", science: "● Scienza e Tecnologia", sport: "● Sport", food: "● Cibo e Bevande" },
 diffs: { easy: "Facile", medium: "Medio", hard: "Esperto" },
 modes: { mc: "Scelta multipla (4 opzioni)", text: "Testo libero" },
 timers: { "30": "30 secondi", "45": "45 secondi", "60": "60 secondi", "0": "Nessun timer" },
 turn: "Turno di", round: "Round", points: "Punti", loading: "Ricerca su Wikipedia...",
 guessPlaceholder: "Scrivi il termine...", btnCheck: "Verifica",
-btnHint: " 🔍 Altro testo (-1 pt)", btnNext: "Avanti ➔", btnMenu: "Menu",
+btnHint: "+ Altro testo (-1 pt)", btnNext: "Avanti ▶", btnMenu: "Menu",
 scoreboard: "Punteggio", ptsShort: "pt", playedShort: "giocati",
-winMsg: " 🎉 Esatto! Era «{title}». +{pts} punti!",
-loseMsg: " ❌ Sbagliato! Era «{title}». 0 punti.",
-timeoutMsg: " ⏱ Tempo scaduto! Era «{title}». 0 punti.",
-tieBanner: " ⚡ SPAREGGIO! Parità in testa – turno decisivo!",
-endTitle: " 🏆 Fine partita e Podio", btnAgain: "Gioca ancora", defaultPlayer: "Giocatore 1"
+winMsg: "✓ Esatto! Era «{title}». +{pts} punti!",
+loseMsg: "✕ Sbagliato! Era «{title}». 0 punti.",
+timeoutMsg: "↺ Tempo scaduto! Era «{title}». 0 punti.",
+tieBanner: "★ SPAREGGIO! Parità in testa – turno decisivo!",
+endTitle: "★ Fine partita e Podio", btnAgain: "Gioca ancora", defaultPlayer: "Giocatore 1"
 },
 es: {
 subtitle: "Adivina el artículo de Wikipedia – ¡menos pistas, más puntos!",
-soundOn: " 🔊 Sonido activado", soundOff: " 🔇 Sin sonido",
+soundOn: "♪ Sonido activado", soundOff: "✕ Sin sonido",
 lblLang: "Idioma (Menú y Artículos)", lblCat: "Categoría", lblDiff: "Dificultad",
 lblMode: "Modo de respuesta", lblTimer: "Temporizador", lblRounds: "Rondas por jugador",
 lblPlayers: "Jugadores (Solo = 1, Multijugador = añadir nombres)",
 playerPlaceholder: "Escribe un nombre...", btnAdd: "+ Añadir", btnStart: "Empezar juego",
-cats: { all: " 🎲 Variado (Todas)", people: " 👤 Personajes", places: " 🌍 Lugares y Monumentos", nature: " 🦁 Animales y Naturaleza", culture: " 🎬 Cultura y Música", science: " 🔬 Ciencia y Tecnología", sport: " ⚽ Deportes", food: " 🍕 Comida y Bebida" },
+cats: { all: "★ Variado (Todas)", people: "● Personajes", places: "● Lugares y Monumentos", nature: "● Animales y Naturaleza", culture: "● Cultura y Música", science: "● Ciencia y Tecnología", sport: "● Deportes", food: "● Comida y Bebida" },
 diffs: { easy: "Fácil", medium: "Medio", hard: "Experto" },
 modes: { mc: "Opción múltiple (4 opciones)", text: "Texto libre" },
 timers: { "30": "30 segundos", "45": "45 segundos", "60": "60 segundos", "0": "Sin límite" },
 turn: "Turno de", round: "Ronda", points: "Puntos", loading: "Buscando en Wikipedia...",
 guessPlaceholder: "Escribe la respuesta...", btnCheck: "Comprobar",
-btnHint: " 🔍 Más texto (-1 pt)", btnNext: "Siguiente ➔", btnMenu: "Menú",
+btnHint: "+ Más texto (-1 pt)", btnNext: "Siguiente ▶", btnMenu: "Menú",
 scoreboard: "Puntuación", ptsShort: "pts", playedShort: "jugados",
-winMsg: " 🎉 ¡Correcto! Era «{title}». +¡{pts} punto(s)!",
-loseMsg: " ❌ ¡Incorrecto! Era «{title}». 0 puntos.",
-timeoutMsg: " ⏱ ¡Tiempo agotado! Era «{title}». 0 puntos.",
-tieBanner: " ⚡ ¡DESEMPATE! Empate en cabeza – ¡ronda decisiva!",
-endTitle: " 🏆 Fin del juego y Podio", btnAgain: "Jugar de nuevo", defaultPlayer: "Jugador 1"
+winMsg: "✓ ¡Correcto! Era «{title}». +¡{pts} punto(s)!",
+loseMsg: "✕ ¡Incorrecto! Era «{title}». 0 puntos.",
+timeoutMsg: "↺ ¡Tiempo agotado! Era «{title}». 0 puntos.",
+tieBanner: "★ ¡DESEMPATE! Empate en cabeza – ¡ronda decisiva!",
+endTitle: "★ Fin del juego y Podio", btnAgain: "Jugar de nuevo", defaultPlayer: "Jugador 1"
 }
+=== ENDE ===
 };
 
 const DB = {
@@ -491,6 +538,65 @@ container.appendChild(tag);
 });
 }
 
+const rootEl = document.getElementById("gameRoot");
+const rootAnchor = document.createComment("ka2-anchor");
+let hasSuspendedGame = false;
+
+function enterFullscreenPlay() {
+if (!rootAnchor.parentNode && rootEl.parentNode) {
+rootEl.parentNode.insertBefore(rootAnchor, rootEl);
+}
+document.body.appendChild(rootEl);
+document.documentElement.style.overflow = "hidden";
+document.body.style.overflow = "hidden";
+rootEl.classList.add("fullscreen-play");
+document.getElementById("exitFsBtn").classList.remove("hidden");
+}
+
+function exitFullscreenPlay() {
+rootEl.classList.remove("fullscreen-play");
+document.documentElement.style.overflow = "";
+document.body.style.overflow = "";
+document.getElementById("exitFsBtn").classList.add("hidden");
+if (rootAnchor.parentNode) {
+rootAnchor.parentNode.insertBefore(rootEl, rootAnchor);
+}
+}
+
+function suspendToMenu() {
+clearInterval(timerInterval);
+hasSuspendedGame = true;
+exitFullscreenPlay();
+document.getElementById("game-screen").classList.add("hidden");
+document.getElementById("end-screen").classList.add("hidden");
+document.getElementById("setup-screen").classList.remove("hidden");
+document.getElementById("resumeBtn").classList.remove("hidden");
+renderPlayerTags();
+}
+
+function resumeGame() {
+if (!hasSuspendedGame) return;
+document.getElementById("setup-screen").classList.add("hidden");
+document.getElementById("end-screen").classList.add("hidden");
+document.getElementById("game-screen").classList.remove("hidden");
+enterFullscreenPlay();
+if (roundActive && parseInt(document.getElementById("timer-select").value, 10) > 0 && timeLeft > 0) {
+timerInterval = setInterval(() => {
+timeLeft--;
+const badge = document.getElementById("timer-badge");
+badge.textContent = "↺ " + timeLeft + "s";
+if (timeLeft <= 5 && timeLeft > 0) {
+badge.classList.add("urgent");
+playTone(Array.of(880), 0.05, "sine");
+}
+if (timeLeft <= 0) {
+clearInterval(timerInterval);
+endRound(false, true);
+}
+}, 1000);
+}
+}
+
 function startGame() {
 const pendingName = document.getElementById("player-name-input").value.trim();
 if (pendingName) addPlayer();
@@ -499,21 +605,28 @@ activePlayers = players.slice();
 currentPlayerIndex = 0;
 currentRoundNum = 1;
 isTiebreaker = false;
+hasSuspendedGame = false;
+document.getElementById("resumeBtn").classList.add("hidden");
 maxRounds = Math.max(1, Math.min(100, parseInt(document.getElementById("rounds-input").value, 10) || 10));
 document.getElementById("tiebreaker-banner").classList.add("hidden");
 document.getElementById("setup-screen").classList.add("hidden");
 document.getElementById("end-screen").classList.add("hidden");
 document.getElementById("game-screen").classList.remove("hidden");
+enterFullscreenPlay();
 loadNextRound();
 }
 
 function backToMenu() {
 clearInterval(timerInterval);
+hasSuspendedGame = false;
+document.getElementById("resumeBtn").classList.add("hidden");
+exitFullscreenPlay();
 document.getElementById("game-screen").classList.add("hidden");
 document.getElementById("end-screen").classList.add("hidden");
 document.getElementById("setup-screen").classList.remove("hidden");
 renderPlayerTags();
 }
+=== ENDE ===
 
 function updateScoreboard() {
 const list = document.getElementById("scoreboard-list");
@@ -887,11 +1000,12 @@ return;
 }
 badge.classList.remove("hidden", "urgent");
 timeLeft = limit;
-badge.textContent = " ⏱ " + timeLeft + "s";
+badge.textContent = "↺ " + timeLeft + "s";
 timerInterval = setInterval(() => {
 timeLeft--;
-badge.textContent = " ⏱ " + timeLeft + "s";
+badge.textContent = "↺ " + timeLeft + "s";
 if (timeLeft <= 5 && timeLeft > 0) {
+=== ENDE ===
 badge.classList.add("urgent");
 playTone([880], 0.05, "sine");
 }
@@ -950,20 +1064,24 @@ loadNextRound();
 }
 
 function showPodium(sortedPlayers) {
+hasSuspendedGame = false;
+document.getElementById("resumeBtn").classList.add("hidden");
 document.getElementById("game-screen").classList.add("hidden");
 document.getElementById("end-screen").classList.remove("hidden");
+=== ENDE ===
 playTone([523.25, 659.25, 783.99, 1046.5], 0.2, "triangle");
 const list = document.getElementById("podium-list");
 list.innerHTML = "";
-const medals = [" 🥇", " 🥈", " 🥉"];
+const medals = Array.of("1. ★", "2.", "3.");
 sortedPlayers.forEach((p, idx) => {
 const div = document.createElement("div");
 div.className = "podium-item" + (idx === 0 ? " first" : "");
-const medal = medals[idx] || (idx + 1) + ".";
+const medal = medals.at(idx) || (idx + 1) + ".";
 div.innerHTML = "<span>" + medal + " " + p.name + "</span><span>" + p.score + " " + t("ptsShort") + "</span>";
 list.appendChild(div);
 });
 }
+=== ENDE ===
 
 document.getElementById("lang-select").addEventListener("change", updateUILanguage);
 document.getElementById("sound-toggle-btn").addEventListener("click", () => {
@@ -983,9 +1101,12 @@ document.getElementById("guess-input").addEventListener("keypress", e => {
 if (e.key === "Enter") submitTextGuess();
 });
 document.getElementById("play-again-btn").addEventListener("click", backToMenu);
+document.getElementById("exitFsBtn").addEventListener("click", suspendToMenu);
+document.getElementById("resumeBtn").addEventListener("click", resumeGame);
 
 updateUILanguage();
 })();
 </script>
 </body>
 </html>
+=== ENDE ===
