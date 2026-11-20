@@ -30,7 +30,6 @@ html, body { margin: 0; padding: 0; background: transparent; width: 100%; }
 .ka2-bar { display: flex; justify-content: flex-start; align-items: center; padding-bottom: 8px; margin-bottom: 10px; border-bottom: 1.5px solid #e2e8f0; gap: 10px; width: 100%; }
 .ka2-brand { display: flex; align-items: center; flex-shrink: 0; }
 .ka2-bar-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-=== ENDE ===
 header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
 h1 { margin: 0; font-size: 1.7rem; letter-spacing: -0.5px; color: #0f172a; }
 
@@ -55,7 +54,6 @@ select, input[type="text"], input[type="number"] { width: 100%; padding: 8px 10p
 @media (max-width: 600px) { .player-inputs-grid { grid-template-columns: 1fr; } }
 .player-input-row { display: flex; flex-direction: column; gap: 3px; }
 .player-input-meta { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
-=== ENDE ===
 .btn { background: var(--primary); color: white; border: none; padding: 12px 18px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; }
 .btn:hover:not(:disabled) { background: var(--primary-hover); }
 .btn:disabled { background: #94a3b8; cursor: not-allowed; }
@@ -102,7 +100,7 @@ select, input[type="text"], input[type="number"] { width: 100%; padding: 8px 10p
 @media (max-width: 600px) {
   #gameRoot.fullscreen-play { top: 0; bottom: 0; width: 100%; height: 100dvh; margin: 0; border-radius: 0; border: none; padding: 10px; }
 }
-=== ENDE ===
+
 #gameRoot.fullscreen-play #game-screen { display: flex; flex-direction: column; flex: 1; min-height: 0; }
 #gameRoot.fullscreen-play .wiki-box { flex: 1; min-height: 80px; overflow-y: auto; -webkit-overflow-scrolling: touch; margin-bottom: 10px; padding: 12px 14px; font-size: 0.96rem; }
 #gameRoot.fullscreen-play header { margin-bottom: 8px; padding-bottom: 8px; }
@@ -143,7 +141,6 @@ select, input[type="text"], input[type="number"] { width: 100%; padding: 8px 10p
 <div class="subtitle" id="ui-subtitle"></div>
 </div>
 </header>
-=== ENDE ===
 <div id="setup-screen">
 <button type="button" class="btn ka2-resume-btn hidden" id="resumeBtn">▶ Laufendes Spiel fortsetzen</button>
 <div class="setup-grid">
@@ -183,7 +180,7 @@ select, input[type="text"], input[type="number"] { width: 100%; padding: 8px 10p
 <select id="player-count-select" class="ka2-sel"></select>
 <div class="player-inputs-grid" id="player-inputs-container"></div>
 </div>
-=== ENDE ===
+
 <button type="button" class="btn" id="start-game-btn"></button>
 </div>
 <div id="game-screen" class="hidden">
@@ -234,7 +231,6 @@ lblMode: "Rate-Modus", lblTimer: "Timer pro Runde", lblRounds: "Runden pro Spiel
 lblPlayers: "Anzahl Spieler",
 soloOpt: "1 Spieler (Solo)", multiOpt: "{n} Spieler",
 playerPlaceholder: "Name Spieler {n}", btnStart: "Spiel starten",
-=== ENDE ===
 cats: { all: "★ Quer-durch (Alle)", people: "● Persönlichkeiten", places: "● Orte & Bauwerke", nature: "● Tiere & Natur", culture: "● Kultur & Musik", science: "● Wissenschaft & Technik", sport: "● Sport", food: "● Essen & Trinken" },
 diffs: { easy: "Leicht", medium: "Mittel", hard: "Experte" },
 modes: { mc: "Multiple Choice (4 Auswahlmöglichkeiten)", text: "Freies Textfeld" },
@@ -257,7 +253,6 @@ lblMode: "Guessing Mode", lblTimer: "Timer per round", lblRounds: "Rounds per pl
 lblPlayers: "Number of players",
 soloOpt: "1 Player (Solo)", multiOpt: "{n} Players",
 playerPlaceholder: "Player {n} name", btnStart: "Start Game",
-=== ENDE ===
 cats: { all: " 🎲 Mix (All categories)", people: " 👤 People", places: " 🌍 Places & Landmarks", nature: " 🦁 Animals & Nature", culture: " 🎬 Culture & Music", science: " 🔬 Science & Tech", sport: " ⚽ Sports", food: " 🍕 Food & Drink" },
 diffs: { easy: "Easy", medium: "Medium", hard: "Expert" },
 modes: { mc: "Multiple Choice (4 options)", text: "Free Text Input" },
@@ -280,7 +275,6 @@ lblMode: "Mode de réponse", lblTimer: "Minuteur par tour", lblRounds: "Tours pa
 lblPlayers: "Nombre de joueurs",
 soloOpt: "1 Joueur (Solo)", multiOpt: "{n} Joueurs",
 playerPlaceholder: "Nom du joueur {n}", btnStart: "Commencer",
-=== ENDE ===
 cats: { all: "★ Mélange (Toutes)", people: "● Personnalités", places: "● Lieux et Monuments", nature: "● Animaux et Nature", culture: "● Culture et Musique", science: "● Science et Tech", sport: "● Sport", food: "● Gastronomie" },
 diffs: { easy: "Facile", medium: "Moyen", hard: "Expert" },
 modes: { mc: "Choix multiple (4 options)", text: "Texte libre" },
@@ -303,7 +297,6 @@ lblMode: "Modalità di risposta", lblTimer: "Timer per turno", lblRounds: "Turni
 lblPlayers: "Numero di giocatori",
 soloOpt: "1 Giocatore (Solo)", multiOpt: "{n} Giocatori",
 playerPlaceholder: "Nome giocatore {n}", btnStart: "Inizia partita",
-=== ENDE ===
 cats: { all: "★ Misto (Tutte)", people: "● Personaggi", places: "● Luoghi e Monumenti", nature: "● Animali e Natura", culture: "● Cultura e Musica", science: "● Scienza e Tecnologia", sport: "● Sport", food: "● Cibo e Bevande" },
 diffs: { easy: "Facile", medium: "Medio", hard: "Esperto" },
 modes: { mc: "Scelta multipla (4 opzioni)", text: "Testo libero" },
@@ -326,7 +319,6 @@ lblMode: "Modo de respuesta", lblTimer: "Temporizador", lblRounds: "Rondas por j
 lblPlayers: "Número de jugadores",
 soloOpt: "1 Jugador (Solo)", multiOpt: "{n} Jugadores",
 playerPlaceholder: "Nombre jugador {n}", btnStart: "Empezar juego",
-=== ENDE ===
 cats: { all: "★ Variado (Todas)", people: "● Personajes", places: "● Lugares y Monumentos", nature: "● Animales y Naturaleza", culture: "● Cultura y Música", science: "● Ciencia y Tecnología", sport: "● Deportes", food: "● Comida y Bebida" },
 diffs: { easy: "Fácil", medium: "Medio", hard: "Experto" },
 modes: { mc: "Opción múltiple (4 opciones)", text: "Texto libre" },
@@ -480,7 +472,6 @@ document.getElementById("ui-lbl-timer").textContent = t("lblTimer");
 document.getElementById("ui-lbl-rounds").textContent = t("lblRounds");
 document.getElementById("ui-lbl-players").textContent = t("lblPlayers");
 document.getElementById("start-game-btn").textContent = t("btnStart");
-=== ENDE ===
 document.getElementById("ui-turn-label").textContent = t("turn");
 document.getElementById("guess-input").placeholder = t("guessPlaceholder");
 document.getElementById("submit-guess-btn").textContent = t("btnCheck");
@@ -498,7 +489,6 @@ populateSelect("timer-select", t("timers"), "45");
 populatePlayerCountSelect();
 renderPlayerInputs();
 }
-=== ENDE ===
 
 function populateSelect(id, mapObj, defaultVal) {
 const sel = document.getElementById(id);
@@ -579,7 +569,6 @@ list.push({ name: t("defaultPlayer"), score: 0 });
 }
 players = list;
 }
-=== ENDE ===
 
 const rootEl = document.getElementById("gameRoot");
 const rootAnchor = document.createComment("ka2-anchor");
@@ -672,7 +661,6 @@ document.getElementById("setup-screen").classList.remove("hidden");
 renderPlayerInputs();
 window.scrollTo(0, 0);
 }
-=== ENDE ===
 
 function updateScoreboard() {
 const list = document.getElementById("scoreboard-list");
@@ -1133,7 +1121,6 @@ soundEnabled = !soundEnabled;
 document.getElementById("sound-toggle-btn").textContent = soundEnabled ? t("soundOn") : t("soundOff");
 });
 document.getElementById("player-count-select").addEventListener("change", renderPlayerInputs);
-=== ENDE ===
 document.getElementById("start-game-btn").addEventListener("click", startGame);
 document.getElementById("hint-btn").addEventListener("click", revealNextHint);
 document.getElementById("next-round-btn").addEventListener("click", nextTurn);
