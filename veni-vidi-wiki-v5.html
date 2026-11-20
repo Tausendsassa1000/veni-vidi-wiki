@@ -374,10 +374,13 @@ sport: [
 ],
 food: [
 { cluster: "dsh", diff: "easy", items: ["Pizza", "Fondue", "Sushi", "Raclette", "Paella", "Spaghetti", "Rösti", "Hamburger"] },
-{ cluster: "chs", diff: "medium", items: ["Emmentaler", "Parmigiano Reggiano", "Gouda (Käse)", "Mozzarella", "Camembert", "Gruyère", "Feta", "Roquefort"] },
-{ cluster: "drk", diff: "easy", items: ["Kaffee", "Tee", "Champagner", "Bier", "Espresso", "Kakao (Getränk)", "Grüner Tee", "Matcha"] },
-{ cluster: "swt", diff: "hard", items: ["Schokolade", "Croissant", "Tiramisu", "Sachertorte", "Baklava", "Marzipan", "Lebkuchen", "Macaron"] }
+{ cluster: "mix1", diff: "medium", items: ["Tiramisu", "Espresso", "Gouda (Käse)", "Croissant", "Champagner", "Lasagne", "Bretzel", "Camembert"] },
+{ cluster: "mix2", diff: "medium", items: ["Schokolade", "Matcha", "Mozzarella", "Apfelstrudel", "Cappuccino", "Risotto", "Feta", "Crêpe"] },
+{ cluster: "drk", diff: "easy", items: ["Kaffee", "Tee", "Bier", "Kakao (Getränk)", "Grüner Tee", "Limonade", "Apfelsaft", "Minztee"] },
+{ cluster: "chs", diff: "hard", items: ["Emmentaler", "Parmigiano Reggiano", "Gruyère", "Roquefort", "Brie (Käse)", "Manchego", "Gorgonzola", "Appenzeller (Käse)"] },
+{ cluster: "swt", diff: "hard", items: ["Sachertorte", "Baklava", "Marzipan", "Lebkuchen", "Macaron", "Panna cotta", "Schwarzwälder Kirschtorte", "Churros"] }
 ]
+
 };
 
 const WIKI_CAT_POOLS = {
@@ -747,7 +750,8 @@ const catKeys = Object.keys(DB);
 currentCategoryKey = selectedCat === "all" ? catKeys[Math.floor(Math.random() * catKeys.length)] : selectedCat;
 document.getElementById("category-badge").textContent = t("cats")[currentCategoryKey].replace(/^[^\s]+\s/, "");
 
-const playerHist = isDefaultPlayer ? new Set() : getPlayerHistory(currentPlayer.name);
+const histOwner = isDefaultPlayer ? "solo_default" : currentPlayer.name;
+const playerHist = getPlayerHistory(histOwner);
 const clusters = DB[currentCategoryKey];
 let matchingClusters = clusters.filter(c => c.diff === selectedDiff);
 if (matchingClusters.length === 0) matchingClusters = clusters;
@@ -788,7 +792,7 @@ const chosen = candidates[Math.floor(Math.random() * candidates.length)];
 currentTargetDe = chosen.term;
 currentClusterItems = chosen.cluster;
 sessionUsed.add(currentTargetDe);
-if (!isDefaultPlayer) savePlayerHistory(currentPlayer.name, currentTargetDe);
+savePlayerHistory(histOwner, currentTargetDe);
 
 try {
 const articleData = await fetchWikiArticle(currentTargetDe, currentLang, selectedDiff);
