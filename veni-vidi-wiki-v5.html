@@ -16,15 +16,22 @@
 --success: #16a34a;
 --danger: #dc2626;
 }
-body:has(> #gameRoot) { margin: 0; padding: 0; background: #090d16; }
+html, body { margin: 0; padding: 0; background: transparent; overflow-x: hidden; width: 100%; }
 #gameRoot, #gameRoot * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-#gameRoot { max-width: 860px; width: 100%; min-height: 66dvh; margin: 10px auto; background: var(--card); color: var(--text); border: 1.5px solid #cbd5e1; border-radius: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; }
-@media (max-width: 600px) { #gameRoot { min-height: auto; margin: 6px auto; padding: 10px; border-radius: 14px; } }
-.ka2-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; margin-bottom: 12px; border-bottom: 1.5px solid #e2e8f0; gap: 8px; }
-.ka2-brand { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 0.92rem; color: var(--muted); }
-.ka2-bar-actions { display: flex; align-items: center; gap: 8px; }
-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
-h1 { margin: 0; font-size: 1.75rem; letter-spacing: -0.5px; color: #0f172a; }
+#gameRoot { max-width: 960px; width: 100%; min-height: 66dvh; margin: 6px auto; background: var(--card); color: var(--text); border: 1.5px solid #cbd5e1; border-radius: 16px; box-shadow: 0 4px 16px rgba(15,23,42,0.06); padding: 16px; display: flex; flex-direction: column; justify-content: flex-start; overflow-x: hidden; }
+@media (max-width: 600px) {
+  #gameRoot { min-height: auto; margin: 2px auto; padding: 8px 10px; border-radius: 12px; }
+  .ka2-bar { padding-bottom: 6px; margin-bottom: 8px; }
+  header { padding-bottom: 8px; margin-bottom: 10px; }
+  h1 { font-size: 1.45rem; }
+  .sound-btn { padding: 5px 8px; font-size: 0.8rem; }
+}
+.ka2-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; margin-bottom: 10px; border-bottom: 1.5px solid #e2e8f0; gap: 6px; width: 100%; }
+.ka2-brand { display: flex; align-items: center; flex-shrink: 0; }
+.ka2-bar-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
+h1 { margin: 0; font-size: 1.7rem; letter-spacing: -0.5px; color: #0f172a; }
+=== ENDE ===
 
 h1 span { color: var(--primary); }
 .subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
@@ -32,7 +39,9 @@ h1 span { color: var(--primary); }
 .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
 @media (max-width: 600px) { .setup-grid { grid-template-columns: 1fr; } }
 label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.88rem; }
-select, input[type="text"], input[type="number"] { width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; background: #fff; color: var(--text); }
+select, input[type="text"], input[type="number"] { width: 100%; padding: 8px 10px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 16px; background: #fff; color: var(--text); min-width: 0; }
+@media (min-width: 601px) { select, input[type="text"], input[type="number"] { font-size: 0.95rem; } }
+=== ENDE ===
 .ka2-sel {
   -webkit-appearance: none; appearance: none; padding-right: 30px;
   background-image: linear-gradient(45deg, transparent 50%, #2563eb 50%), linear-gradient(135deg, #2563eb 50%, transparent 50%);
@@ -115,8 +124,8 @@ select, input[type="text"], input[type="number"] { width: 100%; padding: 9px 12p
 <path d="M111,0 H123 L156,95 H144 L136,72 H98 L90,95 H78 Z M102,62 H132 L117,17 Z" fill="#2d2d2d"/>
 <path d="M138,26 C138,10 150,2 164,2 C178,2 187,11 187,25 C187,39 177,48 161,61 L148,72 H187 V83 H134 V73 L153,56 C168,43 175,36 175,25 C175,17 170,12 163,12 C155,12 150,18 150,27 Z" fill="#2d2d2d"/>
 </svg>
-<span>ka-2.art Games</span>
 </div>
+=== ENDE ===
 <div class="ka2-bar-actions">
 <button type="button" class="sound-btn" id="sound-toggle-btn"></button>
 <button type="button" class="sound-btn hidden" id="exitFsBtn">✕ Menü</button>
