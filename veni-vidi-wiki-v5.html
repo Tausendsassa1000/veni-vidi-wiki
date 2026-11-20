@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -24,7 +25,7 @@ body:has(> #gameRoot) { margin: 0; padding: 0; background: #090d16; }
 .ka2-bar-actions { display: flex; align-items: center; gap: 8px; }
 header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
 h1 { margin: 0; font-size: 1.75rem; letter-spacing: -0.5px; color: #0f172a; }
-=== ENDE ===
+
 h1 span { color: var(--primary); }
 .subtitle { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
 .sound-btn { background: #f1f5f9; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 6px 12px; font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--text); white-space: nowrap; }
@@ -38,7 +39,7 @@ select, input[type="text"], input[type="number"] { width: 100%; padding: 9px 12p
   background-position: calc(100% - 15px) 52%, calc(100% - 10px) 52%;
   background-size: 5px 5px, 5px 5px; background-repeat: no-repeat;
 }
-=== ENDE ===
+
 .player-setup { background: #f1f5f9; padding: 14px; border-radius: 10px; margin-bottom: 18px; }
 .player-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .player-tag { background: var(--primary); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.88rem; display: flex; align-items: center; gap: 8px; }
@@ -95,7 +96,7 @@ select, input[type="text"], input[type="number"] { width: 100%; padding: 9px 12p
 .ka2-rotate-hint { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #0f172a; color: #f8fafc; z-index: 2147483647; align-items: center; justify-content: center; text-align: center; padding: 24px; font-size: 1.1rem; font-weight: 600; }
 @media (orientation: landscape) and (max-height: 460px) and (pointer: coarse) { #gameRoot.fullscreen-play .ka2-rotate-hint { display: flex; } }
 </style>
-=== ENDE ===
+
 </head>
 <body>
 <div id="gameRoot">
@@ -156,7 +157,6 @@ select, input[type="text"], input[type="number"] { width: 100%; padding: 9px 12p
 <label for="timer-select" id="ui-lbl-timer"></label>
 <select id="timer-select" class="ka2-sel"></select>
 </div>
-=== ENDE ===
 <div>
 <label for="rounds-input" id="ui-lbl-rounds"></label>
 <input type="number" id="rounds-input" value="10" min="1" max="100">
@@ -233,7 +233,6 @@ timeoutMsg: "↺ Zeit abgelaufen! Gesucht war „{title}“. 0 Punkte.",
 tieBanner: "★ STECHEN! Gleichstand an der Spitze – Entscheidungsrunde!",
 endTitle: "★ Spielende & Siegerehrung", btnAgain: "Neues Spiel", defaultPlayer: "Spieler 1"
 },
-=== ENDE ===
 en: {
 subtitle: "Guess the Wikipedia entry – fewer hints mean more points!",
 soundOn: " 🔊 Sound on", soundOff: " 🔇 Sound off",
@@ -318,7 +317,7 @@ timeoutMsg: "↺ ¡Tiempo agotado! Era «{title}». 0 puntos.",
 tieBanner: "★ ¡DESEMPATE! Empate en cabeza – ¡ronda decisiva!",
 endTitle: "★ Fin del juego y Podio", btnAgain: "Jugar de nuevo", defaultPlayer: "Jugador 1"
 }
-=== ENDE ===
+
 };
 
 const DB = {
@@ -626,7 +625,6 @@ document.getElementById("end-screen").classList.add("hidden");
 document.getElementById("setup-screen").classList.remove("hidden");
 renderPlayerTags();
 }
-=== ENDE ===
 
 function updateScoreboard() {
 const list = document.getElementById("scoreboard-list");
@@ -1005,7 +1003,7 @@ timerInterval = setInterval(() => {
 timeLeft--;
 badge.textContent = "↺ " + timeLeft + "s";
 if (timeLeft <= 5 && timeLeft > 0) {
-=== ENDE ===
+
 badge.classList.add("urgent");
 playTone([880], 0.05, "sine");
 }
@@ -1068,7 +1066,6 @@ hasSuspendedGame = false;
 document.getElementById("resumeBtn").classList.add("hidden");
 document.getElementById("game-screen").classList.add("hidden");
 document.getElementById("end-screen").classList.remove("hidden");
-=== ENDE ===
 playTone([523.25, 659.25, 783.99, 1046.5], 0.2, "triangle");
 const list = document.getElementById("podium-list");
 list.innerHTML = "";
@@ -1081,7 +1078,6 @@ div.innerHTML = "<span>" + medal + " " + p.name + "</span><span>" + p.score + " 
 list.appendChild(div);
 });
 }
-=== ENDE ===
 
 document.getElementById("lang-select").addEventListener("change", updateUILanguage);
 document.getElementById("sound-toggle-btn").addEventListener("click", () => {
@@ -1109,4 +1105,3 @@ updateUILanguage();
 </script>
 </body>
 </html>
-=== ENDE ===
